@@ -117,7 +117,7 @@ export HADOOP_HOME=/opt/hadoop
 export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin
 EOF
 
-    /bin/cp -r /vagrant/configs/hadoop/etc/hadoop/* /opt/hadoop/etc/hadoop
+    /bin/cp -r /vagrant/configs/hadoop/* /opt/hadoop
 
     mkdir -p /data/hadoop/tmp
     chown -R hduser:hadoop /data/hadoop
