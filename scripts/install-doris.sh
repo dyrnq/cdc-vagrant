@@ -87,9 +87,18 @@ if [ -f /etc/selinux/config ]; then sed -i.bak 's@enforcing@disabled@' /etc/seli
 command -v setenforce && setenforce 0
 command -v getenforce && getenforce && sestatus
 
-cat >/etc/security/limits.conf <<EOF
-* soft nofile 65536
-* hard nofile 65536
+## limits 修改
+
+cat > /etc/security/limits.conf <<'EOF'
+*       soft        core        unlimited
+*       hard        core        unlimited
+*       soft        nproc       1000000
+*       hard        nproc       1000000
+*       soft        nofile      1000000
+*       hard        nofile      1000000
+*       soft        memlock     32000
+*       hard        memlock     32000
+*       soft        msgqueue    8192000
 EOF
 
 }
