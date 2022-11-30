@@ -16,12 +16,17 @@ Vagrant.configure("2") do |config|
     config.ssh.private_key_path = "insecure_private_key"
 
     my_machines = {
-        'vm1'   => '192.168.56.111',
-        'vm2'   => '192.168.56.112',
-        'vm3'   => '192.168.56.113',
-        'vm4'   => '192.168.56.114',
-        'vm5'   => '192.168.56.115',
-        'vm6'   => '192.168.56.116',
+        'vm111'   => '192.168.56.111',
+        'vm112'   => '192.168.56.112',
+        'vm113'   => '192.168.56.113',
+        'vm114'   => '192.168.56.114',
+        'vm115'   => '192.168.56.115',
+        'vm116'   => '192.168.56.116',
+        'vm117'   => '192.168.56.117',
+        'vm118'   => '192.168.56.118',
+        'vm119'   => '192.168.56.119',
+        'vm120'   => '192.168.56.120',
+        'vm121'   => '192.168.56.121',
     }
 
     my_machines.each do |name, ip|
@@ -43,17 +48,26 @@ Vagrant.configure("2") do |config|
                 timedatectl set-timezone "Asia/Shanghai"
             SHELL
 
-            if name == "vm1"
+            if name == "vm111"
                 machine.vm.provision "shell", inline: <<-SHELL
                     bash /vagrant/scripts/install-doris.sh --fe --iface enp0s8 --fe-role "leader"
                 SHELL
-            elsif name == "vm2"
+            elsif name == "vm112"
                 machine.vm.provision "shell", inline: <<-SHELL
                     bash /vagrant/scripts/install-doris.sh --fe --iface enp0s8 --fe-leader "192.168.56.111" --fe-role "observer"
                 SHELL
-            elsif name == "vm3" or name == "vm4" or name == "vm5"
+            elsif name == "vm113" or name == "vm114" or name == "vm115"
                 machine.vm.provision "shell", inline: <<-SHELL
                     bash /vagrant/scripts/install-doris.sh --be --iface enp0s8 --fe-leader "192.168.56.111"
+                SHELL
+            elsif name == "vm116" or name == "vm117" or name == "vm118"
+                machine.vm.provision "shell", inline: <<-SHELL
+                    bash /vagrant/scripts/install-zookeeper.sh --iface enp0s8 --ips "192.168.56.116,192.168.56.117,192.168.56.118"
+                    bash /vagrant/scripts/install-hadoop.sh --iface enp0s8 --ips "192.168.56.116,192.168.56.117,192.168.56.118,192.168.56.119,192.168.56.120,192.168.56.121"
+                SHELL
+            elsif name == "vm119" or name == "vm120" or name == "vm121"
+                machine.vm.provision "shell", inline: <<-SHELL
+                    bash /vagrant/scripts/install-hadoop.sh --iface enp0s8 --ips "192.168.56.116,192.168.56.117,192.168.56.118,192.168.56.119,192.168.56.120,192.168.56.121"
                 SHELL
             else
                 machine.vm.provision "shell", inline: <<-SHELL
