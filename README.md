@@ -8,19 +8,19 @@ CDC(Change Data Capture) is made up of two components, the CDD and the CDT. CDD 
 
 ## architecture
 
-| vm    | role                                                 | ip             | xxx_home       |
-|-------|------------------------------------------------------|----------------|----------------|
-| vm111 | doris FE(leader)                                     | 192.168.56.111 | /opt/doris/fe/ |
-| vm112 | doris FE(observer)                                   | 192.168.56.112 | /opt/doris/fe/ |
-| vm113 | doris BE                                             | 192.168.56.113 | /opt/doris/be/ |
-| vm114 | doris BE                                             | 192.168.56.114 | /opt/doris/be/ |
-| vm115 | doris BE                                             | 192.168.56.115 | /opt/doris/be/ |
-| vm116 | hdfs: NameNode（active）,zkfc, yarn: RM ,zookeeper   | 192.168.56.116 |                |
-| vm117 | hdfs: NameNode（standby）,zkfc, yarn: RM ,zookeeper  | 192.168.56.117 |                |
-| vm118 | hdfs: NameNode（observer）,zkfc, yarn: RM ,zookeeper | 192.168.56.118 |                |
-| vm119 | hdfs: DataNode, JournalNode, yarn: NM                | 192.168.56.119 |                |
-| vm120 | hdfs: DataNode, JournalNode, yarn: NM                | 192.168.56.120 |                |
-| vm121 | hdfs: DataNode, JournalNode, yarn: NM                | 192.168.56.121 |                |
+| vm    | role                                               | ip             | xxx_home       |
+|-------|----------------------------------------------------|----------------|----------------|
+| vm111 | doris FE(leader)                                   | 192.168.56.111 | /opt/doris/fe/ |
+| vm112 | doris FE(observer)                                 | 192.168.56.112 | /opt/doris/fe/ |
+| vm113 | doris BE                                           | 192.168.56.113 | /opt/doris/be/ |
+| vm114 | doris BE                                           | 192.168.56.114 | /opt/doris/be/ |
+| vm115 | doris BE                                           | 192.168.56.115 | /opt/doris/be/ |
+| vm116 | hdfs: NameNode(active),zkfc, yarn: RM, zookeeper   | 192.168.56.116 | /opt/hadoop    |
+| vm117 | hdfs: NameNode(standby),zkfc, yarn: RM, zookeeper  | 192.168.56.117 | /opt/hadoop    |
+| vm118 | hdfs: NameNode(observer),zkfc, yarn: RM, zookeeper | 192.168.56.118 | /opt/hadoop    |
+| vm119 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.119 | /opt/hadoop    |
+| vm120 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.120 | /opt/hadoop    |
+| vm121 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.121 | /opt/hadoop    |
 
 ## HDFS HA
 
@@ -65,6 +65,16 @@ CDC(Change Data Capture) is made up of two components, the CDD and the CDT. CDD 
 # yarn --daemon start resourcemanager   //vm116 vm117 vm118
 # yarn --daemon start nodemanager       //vm119 vm120 vm121
 ```
+
+## minio HA
+
+```bash
+# vm116 vm117 vm118 vm119
+bash /vagrant/scripts/install-docker.sh
+bash /vagrant/scripts/install-minio.sh
+```
+
+ref [docker-compose.yaml](https://raw.githubusercontent.com/minio/minio/master/docs/orchestration/docker-compose/docker-compose.yaml)
 
 ## ref
 
