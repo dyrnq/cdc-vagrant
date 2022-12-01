@@ -25,25 +25,25 @@ CDC(Change Data Capture) is made up of two components, the CDD and the CDT. CDD 
 ## HDFS HA
 
 ```bash
-# vm116 vm117 vm118
-# hdfs zkfc -formatZK (一台执行，执行一次)
+
 
 
 
 # vm116
-# hdfs namenode -format(执行一次)
-# hdfs --daemon start namenode
+# hdfs namenode -format (执行一次)
+# hdfs --daemon start namenode (依赖QJM，需启动 hdfs --daemon start journalnode)
+# hdfs zkfc -formatZK (执行一次)
 # hdfs --daemon start zkfc
 
 
 # vm117
-# hdfs namenode -bootstrapStandby（执行一次）
-# hdfs --daemon start namenode
+# hdfs namenode -bootstrapStandby （执行一次）
+# hdfs --daemon start namenode (依赖QJM，需启动 hdfs --daemon start journalnode)
 # hdfs --daemon start zkfc
 
 # vm118
-# hdfs namenode -bootstrapStandby（执行一次）
-# hdfs --daemon start namenode
+# hdfs namenode -bootstrapStandby （执行一次）
+# hdfs --daemon start namenode (依赖QJM，需启动 hdfs --daemon start journalnode)
 # hdfs --daemon start zkfc
 
 # hduser@vm116:~$ hdfs haadmin -getServiceState nn1
