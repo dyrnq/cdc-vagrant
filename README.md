@@ -74,6 +74,28 @@ bash /vagrant/scripts/install-docker.sh
 bash /vagrant/scripts/install-minio.sh
 ```
 
+## flink standalone HA
+
+```bash
+# vm116 vm117 vm118 vm119
+bash /vagrant/scripts/install-flink.sh
+# https://blog.csdn.net/hiliang521/article/details/126860098
+
+su -l hduser
+## start-cluster
+start-cluster.sh
+## stop-cluster
+stop-cluster.sh
+## 
+jobmanager.sh start
+##
+taskmanager.sh start
+```
+
+```bash
+flink run /opt/flink/examples/streaming/WordCount.jar  --input /opt/flink/conf/flink-conf.yaml
+```
+
 ref [docker-compose.yaml](https://raw.githubusercontent.com/minio/minio/master/docs/orchestration/docker-compose/docker-compose.yaml)
 
 ## ref
