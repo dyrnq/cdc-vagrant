@@ -15,6 +15,9 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - TZ=Asia/Shanghai
+    volumes:
+      - /etc/timezone:/etc/timezone
   mysql:
     restart: always
     image: debezium/example-mysql:1.1
@@ -24,6 +27,9 @@ services:
       - MYSQL_ROOT_PASSWORD=123456
       - MYSQL_USER=mysqluser
       - MYSQL_PASSWORD=mysqlpw
+      - TZ=Asia/Shanghai
+    volumes:
+      - /etc/timezone:/etc/timezone
   elasticsearch:
     restart: always
     image: elastic/elasticsearch:7.6.0
@@ -32,6 +38,9 @@ services:
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - discovery.type=single-node
+      - TZ=Asia/Shanghai
+    volumes:
+      - /etc/timezone:/etc/timezone
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -47,6 +56,8 @@ services:
     image: elastic/kibana:7.6.0
     ports:
       - "5601:5601"
+    volumes:
+      - /etc/timezone:/etc/timezone
 EOF
 
 
