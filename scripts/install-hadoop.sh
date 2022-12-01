@@ -107,17 +107,18 @@ cat /etc/hosts
 
 }
 fun_install(){
-    mkdir -p /opt/hadoop
-    chown -R hduser:hadoop /opt/hadoop
+    hadoop_home="/opt/hadoop"
+    mkdir -p ${hadoop_home}
+    chown -R hduser:hadoop ${hadoop_home}
     echo "install hadoop .............."
-    gosu hduser bash -c "curl -fsSL https://mirrors.ustc.edu.cn/apache/hadoop/common/hadoop-3.3.4/hadoop-3.3.4.tar.gz | tar -xz --strip-components 1 --directory /opt/hadoop"
+    gosu hduser bash -c "curl -fsSL https://mirrors.ustc.edu.cn/apache/hadoop/common/hadoop-3.3.4/hadoop-3.3.4.tar.gz | tar -xz --strip-components 1 --directory ${hadoop_home}"
 
-    cat > /etc/profile.d/myenv.sh <<EOF
-export HADOOP_HOME=/opt/hadoop
+    cat > /etc/profile.d/myhadoop.sh <<EOF
+export HADOOP_HOME=${hadoop_home}
 export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin
 EOF
 
-    /bin/cp -r /vagrant/configs/hadoop/* /opt/hadoop
+    /bin/cp -r /vagrant/configs/hadoop/* ${hadoop_home}
 
     mkdir -p /data/hadoop/tmp
     chown -R hduser:hadoop /data/hadoop
