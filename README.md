@@ -6,6 +6,25 @@ This project is for experiment of flink-cdc and doris.
 
 CDC(Change Data Capture) is made up of two components, the CDD and the CDT. CDD is stand for Change Data Detection and CDT is stand for Change Data Transfer.
 
+Extract, Load, Transform (ELT) is a data integration process for transferring raw data from a source server to a data system (such as a data warehouse or data lake) on a target server and then preparing the information for downstream uses.
+
+<!--ts-->
+- [cdc-vagrant](#cdc-vagrant)
+  - [introduce](#introduce)
+  - [architecture](#architecture)
+  - [Usage](#usage)
+    - [HDFS HA](#hdfs-ha)
+    - [YARN HA](#yarn-ha)
+    - [minio HA](#minio-ha)
+    - [flink standalone HA](#flink-standalone-ha)
+    - [flink cdc](#flink-cdc)
+      - [mysql](#mysql)
+      - [postgres](#postgres)
+      - [sql-client.sh](#sql-clientsh)
+      - [mysql additional test](#mysql-additional-test)
+  - [ref](#ref)
+<!--te-->
+
 ## architecture
 
 | vm    | role                                               | ip             | xxx_home       |
@@ -22,7 +41,9 @@ CDC(Change Data Capture) is made up of two components, the CDD and the CDT. CDD 
 | vm120 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.120 | /opt/hadoop    |
 | vm121 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.121 | /opt/hadoop    |
 
-## HDFS HA
+## Usage
+
+### HDFS HA
 
 ```bash
 
@@ -59,14 +80,14 @@ CDC(Change Data Capture) is made up of two components, the CDD and the CDT. CDD 
 # hdfs --daemon start datanode
 ```
 
-## YARN HA
+### YARN HA
 
 ```bash
 # yarn --daemon start resourcemanager   //vm116 vm117 vm118
 # yarn --daemon start nodemanager       //vm119 vm120 vm121
 ```
 
-## minio HA
+### minio HA
 
 ```bash
 # vm116 vm117 vm118 vm119
@@ -74,7 +95,9 @@ bash /vagrant/scripts/install-docker.sh
 bash /vagrant/scripts/install-minio.sh
 ```
 
-## flink standalone HA
+ref [docker-compose.yaml](https://raw.githubusercontent.com/minio/minio/master/docs/orchestration/docker-compose/docker-compose.yaml)
+
+### flink standalone HA
 
 ```bash
 # vm116 vm117 vm118 vm119
@@ -96,7 +119,173 @@ taskmanager.sh start
 flink run /opt/flink/examples/streaming/WordCount.jar  --input /opt/flink/conf/flink-conf.yaml
 ```
 
-ref [docker-compose.yaml](https://raw.githubusercontent.com/minio/minio/master/docs/orchestration/docker-compose/docker-compose.yaml)
+### flink cdc
+
+this is an experimental environment of [基于 Flink CDC 构建 MySQL 和 Postgres 的 Streaming ETL
+](https://ververica.github.io/flink-cdc-connectors/master/content/%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B/mysql-postgres-tutorial-zh.html).
+
+The difference is that high availability of flink standalone and Shanghai time zone is used.
+
+#### mysql
+
+```bash
+docker compose exec mysql mysql -uroot -p123456
+```
+
+```bash
+SET GLOBAL time_zone = '+8:00';
+flush privileges;
+SHOW VARIABLES LIKE '%time_zone%';
+-- MySQL
+CREATE DATABASE mydb;
+USE mydb;
+CREATE TABLE products (
+  id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description VARCHAR(512)
+);
+ALTER TABLE products AUTO_INCREMENT = 101;
+INSERT INTO products
+VALUES (default,"scooter","Small 2-wheel scooter"),
+       (default,"car battery","12V car battery"),
+       (default,"12-pack drill bits","12-pack of drill bits with sizes ranging from #40 to #3"),
+       (default,"hammer","12oz carpenter's hammer"),
+       (default,"hammer","14oz carpenter's hammer"),
+       (default,"hammer","16oz carpenter's hammer"),
+       (default,"rocks","box of assorted rocks"),
+       (default,"jacket","water resistent black wind breaker"),
+       (default,"spare tire","24 inch spare tire");
+
+CREATE TABLE orders (
+  order_id INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  order_date DATETIME NOT NULL,
+  customer_name VARCHAR(255) NOT NULL,
+  price DECIMAL(10, 5) NOT NULL,
+  product_id INTEGER NOT NULL,
+  order_status BOOLEAN NOT NULL -- Whether order has been placed
+) AUTO_INCREMENT = 10001;
+
+INSERT INTO orders
+VALUES (default, '2020-07-30 10:08:22', 'Jark', 50.50, 102, false),
+       (default, '2020-07-30 10:11:09', 'Sally', 15.00, 105, false),
+       (default, '2020-07-30 12:00:30', 'Edward', 25.25, 106, false);
+
+```
+
+#### postgres
+
+```bash
+docker compose exec postgres psql -h localhost -U postgres
+```
+
+```bash
+
+CREATE TABLE shipments (
+  shipment_id SERIAL NOT NULL PRIMARY KEY,
+  order_id SERIAL NOT NULL,
+  origin VARCHAR(255) NOT NULL,
+  destination VARCHAR(255) NOT NULL,
+  is_arrived BOOLEAN NOT NULL
+);
+ALTER SEQUENCE public.shipments_shipment_id_seq RESTART WITH 1001;
+ALTER TABLE public.shipments REPLICA IDENTITY FULL;
+INSERT INTO shipments
+VALUES (default,10001,'Beijing','Shanghai',false),
+       (default,10002,'Hangzhou','Shanghai',false),
+       (default,10003,'Shanghai','Hangzhou',false);
+```
+
+#### sql-client.sh
+
+```bash
+
+CREATE TABLE products (
+    id INT,
+    name STRING,
+    description STRING,
+    PRIMARY KEY (id) NOT ENFORCED
+  ) WITH (
+    'connector' = 'mysql-cdc',
+    'hostname' = '192.168.56.116',
+    'port' = '3306',
+    'username' = 'root',
+    'password' = '123456',
+    'database-name' = 'mydb',
+    'table-name' = 'products'
+  );
+
+CREATE TABLE orders (
+   order_id INT,
+   order_date TIMESTAMP(0),
+   customer_name STRING,
+   price DECIMAL(10, 5),
+   product_id INT,
+   order_status BOOLEAN,
+   PRIMARY KEY (order_id) NOT ENFORCED
+ ) WITH (
+   'connector' = 'mysql-cdc',
+   'hostname' = '192.168.56.116',
+   'port' = '3306',
+   'username' = 'root',
+   'password' = '123456',
+   'database-name' = 'mydb',
+   'table-name' = 'orders'
+ );
+
+CREATE TABLE shipments (
+   shipment_id INT,
+   order_id INT,
+   origin STRING,
+   destination STRING,
+   is_arrived BOOLEAN,
+   PRIMARY KEY (shipment_id) NOT ENFORCED
+ ) WITH (
+   'connector' = 'postgres-cdc',
+   'hostname' = '192.168.56.116',
+   'port' = '5432',
+   'username' = 'postgres',
+   'password' = 'postgres',
+   'database-name' = 'postgres',
+   'schema-name' = 'public',
+   'table-name' = 'shipments'
+ );
+
+
+ CREATE TABLE enriched_orders (
+   order_id INT,
+   order_date TIMESTAMP(0),
+   customer_name STRING,
+   price DECIMAL(10, 5),
+   product_id INT,
+   order_status BOOLEAN,
+   product_name STRING,
+   product_description STRING,
+   shipment_id INT,
+   origin STRING,
+   destination STRING,
+   is_arrived BOOLEAN,
+   PRIMARY KEY (order_id) NOT ENFORCED
+ ) WITH (
+     'connector' = 'elasticsearch-7',
+     'hosts' = 'http://192.168.56.116:9200',
+     'index' = 'enriched_orders'
+ );
+
+ INSERT INTO enriched_orders
+ SELECT o.*, p.name, p.description, s.shipment_id, s.origin, s.destination, s.is_arrived
+ FROM orders AS o
+ LEFT JOIN products AS p ON o.product_id = p.id
+ LEFT JOIN shipments AS s ON o.order_id = s.order_id;
+
+
+```
+
+#### mysql additional test
+
+```bash
+INSERT INTO orders VALUES (default, '2022-07-30 10:08:22', 'dddd', 666, 105, false);
+INSERT INTO orders VALUES (default, '2022-07-30 10:08:22', 'tttt', 888, 105, false);
+```
 
 ## ref
 
