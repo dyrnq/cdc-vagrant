@@ -110,14 +110,6 @@ chmod +x /usr/local/bin/mc
 mc --help
 ```
 
-#### minio load balancer
-
-```bash
-bash /vagrant/scripts/install-minio-sidekick.sh --port "18000" --sites "http://vm{116...119}:9000"
-```
-
-[High Performance HTTP Sidecar Load Balancer](https://github.com/minio/sidekick)
-
 ```bash
 mc alias set myminio http://localhost:9000 minioadmin minioadmin
 # mc admin user svcacct add --access-key "myuserserviceaccount" --secret-key "myuserserviceaccountpassword" myminio minioadmin
@@ -125,6 +117,14 @@ mc admin user svcacct add --access-key "u5SybesIDVX9b6Pk" --secret-key "lOpH1v7k
 ```
 
 [mc](https://github.com/minio/mc)
+
+#### minio load balancer
+
+```bash
+bash /vagrant/scripts/install-minio-sidekick.sh --port "18000" --sites "http://vm{116...119}:9000"
+```
+
+[High Performance HTTP Sidecar Load Balancer](https://github.com/minio/sidekick)
 
 ### flink standalone HA
 
