@@ -73,5 +73,6 @@ curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/com/ververica/fli
 curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/com/ververica/flink-sql-connector-postgres-cdc/2.3.0/flink-sql-connector-postgres-cdc-2.3.0.jar
 curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/com/ververica/flink-sql-connector-mongodb-cdc/2.3.0/flink-sql-connector-mongodb-cdc-2.3.0.jar
 curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/com/ververica/flink-sql-connector-sqlserver-cdc/2.3.0/flink-sql-connector-sqlserver-cdc-2.3.0.jar
+curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/org/apache/doris/flink-doris-connector-1.16/1.3.0/flink-doris-connector-1.16-1.3.0.jar
 EOF
 gosu hduser bash /tmp/download.sh
