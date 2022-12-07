@@ -307,7 +307,7 @@ classloader.resolve-order: parent-first
 #historyserver.archive.fs.refresh-interval: 10000
 
 ############### TODO TODO #############################
-s3.endpoint: http://_MINIO_VIP_:9000
+s3.endpoint: http://_MINIO_VIP_:18000
 s3.path.style.access: true
 s3.access-key: u5SybesIDVX9b6Pk
 s3.secret-key: lOpH1v7kdM6H8NkPu1H2R6gLc9jcsmWM
