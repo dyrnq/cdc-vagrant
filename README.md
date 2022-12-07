@@ -15,7 +15,8 @@ Streaming ETL (Extract, Transform, Load) is the processing and movement of real-
   - [introduce](#introduce)
   - [architecture](#architecture)
     - [doris cluster](#doris-cluster)
-    - [flink cluster](#flink-cluster)
+    - [hdfs cluster and yarn cluster](#hdfs-cluster-and-yarn-cluster)
+    - [flink standalone cluster](#flink-standalone-cluster)
   - [Usage](#usage)
     - [HDFS HA](#hdfs-ha)
     - [YARN HA](#yarn-ha)
@@ -44,6 +45,11 @@ Streaming ETL (Extract, Transform, Load) is the processing and movement of real-
 | vm113 | doris BE                                           | 192.168.56.113 | /opt/doris/be/ |
 | vm114 | doris BE                                           | 192.168.56.114 | /opt/doris/be/ |
 | vm115 | doris BE                                           | 192.168.56.115 | /opt/doris/be/ |
+
+### hdfs cluster and yarn cluster
+
+| vm    | role                                               | ip             | xxx_home       |
+|-------|----------------------------------------------------|----------------|----------------|
 | vm116 | hdfs: NameNode(active),zkfc, yarn: RM, zookeeper   | 192.168.56.116 | /opt/hadoop    |
 | vm117 | hdfs: NameNode(standby),zkfc, yarn: RM, zookeeper  | 192.168.56.117 | /opt/hadoop    |
 | vm118 | hdfs: NameNode(observer),zkfc, yarn: RM, zookeeper | 192.168.56.118 | /opt/hadoop    |
@@ -51,9 +57,9 @@ Streaming ETL (Extract, Transform, Load) is the processing and movement of real-
 | vm120 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.120 | /opt/hadoop    |
 | vm121 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.121 | /opt/hadoop    |
 
-### flink cluster
+### flink standalone cluster
 
-minio cluster and flink cluster
+minio cluster and flink standalone cluster
 
 Reuse the above virtual machines due to hardware constraints.
 
