@@ -71,5 +71,7 @@ pushd /opt/flink/lib
 curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/org/apache/flink/flink-sql-connector-elasticsearch7/1.16.0/flink-sql-connector-elasticsearch7-1.16.0.jar
 curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/com/ververica/flink-sql-connector-mysql-cdc/2.3.0/flink-sql-connector-mysql-cdc-2.3.0.jar
 curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/com/ververica/flink-sql-connector-postgres-cdc/2.3.0/flink-sql-connector-postgres-cdc-2.3.0.jar
+curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/com/ververica/flink-sql-connector-mongodb-cdc/2.3.0/flink-sql-connector-mongodb-cdc-2.3.0.jar
+curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/com/ververica/flink-sql-connector-sqlserver-cdc/2.3.0/flink-sql-connector-sqlserver-cdc-2.3.0.jar
 EOF
 gosu hduser bash /tmp/download.sh
