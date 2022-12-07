@@ -12,6 +12,8 @@ Extract, Load, Transform (ELT) is a data integration process for transferring ra
 - [cdc-vagrant](#cdc-vagrant)
   - [introduce](#introduce)
   - [architecture](#architecture)
+    - [doris cluster](#doris-cluster)
+    - [flink cluster](#flink-cluster)
   - [Usage](#usage)
     - [HDFS HA](#hdfs-ha)
     - [YARN HA](#yarn-ha)
@@ -31,6 +33,8 @@ Extract, Load, Transform (ELT) is a data integration process for transferring ra
 
 ## architecture
 
+### doris cluster
+
 | vm    | role                                               | ip             | xxx_home       |
 |-------|----------------------------------------------------|----------------|----------------|
 | vm111 | doris FE(leader)                                   | 192.168.56.111 | /opt/doris/fe/ |
@@ -44,6 +48,21 @@ Extract, Load, Transform (ELT) is a data integration process for transferring ra
 | vm119 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.119 | /opt/hadoop    |
 | vm120 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.120 | /opt/hadoop    |
 | vm121 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.121 | /opt/hadoop    |
+
+### flink cluster
+
+minio cluster and flink cluster
+
+Reuse the above virtual machines due to hardware constraints.
+
+| vm    | role                                                        | ip             | xxx_home   |
+|-------|-------------------------------------------------------------|----------------|------------|
+| vm116 | docker and compose, minio, sidekick, flink(masters+workers) | 192.168.56.116 | /opt/flink |
+| vm117 | docker and compose, minio, sidekick, flink(masters+workers) | 192.168.56.117 | /opt/flink |
+| vm118 | docker and compose, minio, sidekick, flink(masters+workers) | 192.168.56.118 | /opt/flink |
+| vm119 | docker and compose, minio, sidekick, flink(workers)         | 192.168.56.119 | /opt/flink |
+| vm120 | docker and compose, sidekick, flink(workers)                | 192.168.56.120 | /opt/flink |
+| vm121 | docker and compose, sidekick, flink(workers)                | 192.168.56.121 | /opt/flink |
 
 ## Usage
 
