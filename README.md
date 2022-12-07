@@ -16,6 +16,8 @@ Extract, Load, Transform (ELT) is a data integration process for transferring ra
     - [HDFS HA](#hdfs-ha)
     - [YARN HA](#yarn-ha)
     - [minio HA](#minio-ha)
+      - [minio server](#minio-server)
+      - [minio client](#minio-client)
     - [flink standalone HA](#flink-standalone-ha)
     - [flink cdc](#flink-cdc)
       - [mysql](#mysql)
@@ -89,6 +91,8 @@ Extract, Load, Transform (ELT) is a data integration process for transferring ra
 
 ### minio HA
 
+#### minio server
+
 ```bash
 # vm116 vm117 vm118 vm119
 bash /vagrant/scripts/install-docker.sh
@@ -96,6 +100,22 @@ bash /vagrant/scripts/install-minio.sh
 ```
 
 ref [docker-compose.yaml](https://raw.githubusercontent.com/minio/minio/master/docs/orchestration/docker-compose/docker-compose.yaml)
+
+#### minio client
+
+```bash
+curl -o /usr/local/bin/mc -# -fSL https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x /usr/local/bin/mc
+mc --help
+```
+
+```bash
+mc alias set myminio http://localhost:9000 minioadmin minioadmin
+# mc admin user svcacct add --access-key "myuserserviceaccount" --secret-key "myuserserviceaccountpassword" myminio minioadmin
+mc admin user svcacct add --access-key "u5SybesIDVX9b6Pk" --secret-key "lOpH1v7kdM6H8NkPu1H2R6gLc9jcsmWM" myminio minioadmin
+```
+
+[mc](https://github.com/minio/mc)
 
 ### flink standalone HA
 
