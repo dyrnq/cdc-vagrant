@@ -8,6 +8,8 @@ CDC(Change Data Capture) is made up of two components, the CDD and the CDT. CDD 
 
 Extract, Load, Transform (ELT) is a data integration process for transferring raw data from a source server to a data system (such as a data warehouse or data lake) on a target server and then preparing the information for downstream uses.
 
+Streaming ETL (Extract, Transform, Load) is the processing and movement of real-time data from one place to another. ETL is short for the database functions extract, transform, and load.
+
 <!--ts-->
 - [cdc-vagrant](#cdc-vagrant)
   - [introduce](#introduce)
