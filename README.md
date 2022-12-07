@@ -25,6 +25,7 @@ Extract, Load, Transform (ELT) is a data integration process for transferring ra
       - [postgres](#postgres)
       - [sql-client.sh](#sql-clientsh)
       - [mysql additional test](#mysql-additional-test)
+      - [cdc to doris](#cdc-to-doris)
   - [ref](#ref)
 <!--te-->
 
@@ -226,6 +227,12 @@ VALUES (default,10001,'Beijing','Shanghai',false),
 
 #### sql-client.sh
 
+enable checkpoints every 3 seconds.
+
+```bash
+SET execution.checkpointing.interval = 3s;
+```
+
 ```bash
 
 CREATE TABLE products (
@@ -309,12 +316,76 @@ CREATE TABLE shipments (
 
 ```
 
+Principle explanation
+
+create source tables that capture the change data from the corresponding database tables.
+create slink table that is used to load data to the Elasticsearch.
+select source table into slink talbe to write to the Elasticsearch.
+
 #### mysql additional test
 
 ```bash
 INSERT INTO orders VALUES (default, '2022-07-30 10:08:22', 'dddd', 666, 105, false);
 INSERT INTO orders VALUES (default, '2022-07-30 10:08:22', 'tttt', 888, 105, false);
 ```
+
+#### cdc to doris
+
+create doris database
+
+```bash
+mysql  -h 192.168.56.111 -P9030 -uroot
+CREATE DATABASE IF NOT EXISTS db;
+
+
+CREATE TABLE db.`test_sink` (
+  `id` INT,
+  `name` STRING
+) ENGINE=OLAP COMMENT "OLAP" 
+DISTRIBUTED BY HASH(`id`) BUCKETS 3;
+
+```
+
+sql-client.sh
+
+```bash
+
+CREATE TABLE cdc_test_source (
+    id INT,
+    name STRING,
+    description STRING,
+    PRIMARY KEY (id) NOT ENFORCED
+  ) WITH (
+    'connector' = 'mysql-cdc',
+    'hostname' = '192.168.56.116',
+    'port' = '3306',
+    'username' = 'root',
+    'password' = '123456',
+    'database-name' = 'mydb',
+    'table-name' = 'products'
+  );
+
+
+
+CREATE TABLE doris_test_sink (
+id INT,
+name STRING
+) WITH (
+  'connector' = 'doris',
+  'fenodes' = '192.168.56.111:8030',
+  'table.identifier' = 'db.test_sink',
+  'username' = 'root',
+  'password' = '',
+  'sink.label-prefix' = 'doris_label',
+  'sink.properties.format' = 'json',
+  'sink.properties.read_json_by_line' = 'true'
+);
+
+INSERT INTO doris_test_sink select id,name from cdc_test_source;
+
+```
+
+[https://github.com/apache/doris/blob/master/samples/doris-demo/flink-demo-v1.1](https://github.com/apache/doris/blob/master/samples/doris-demo/flink-demo-v1.1/src/main/java/org/apache/doris/demo/flink/Cdc2DorisSQLDemo.java)
 
 ## ref
 
