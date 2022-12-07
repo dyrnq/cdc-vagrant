@@ -18,6 +18,7 @@ Extract, Load, Transform (ELT) is a data integration process for transferring ra
     - [minio HA](#minio-ha)
       - [minio server](#minio-server)
       - [minio client](#minio-client)
+      - [minio load balancer](#minio-load-balancer)
     - [flink standalone HA](#flink-standalone-ha)
     - [flink cdc](#flink-cdc)
       - [mysql](#mysql)
@@ -108,6 +109,14 @@ curl -o /usr/local/bin/mc -# -fSL https://dl.min.io/client/mc/release/linux-amd6
 chmod +x /usr/local/bin/mc
 mc --help
 ```
+
+#### minio load balancer
+
+```bash
+bash /vagrant/scripts/install-minio-sidekick.sh --port "18000" --sites "http://vm{116...119}:9000"
+```
+
+[High Performance HTTP Sidecar Load Balancer](https://github.com/minio/sidekick)
 
 ```bash
 mc alias set myminio http://localhost:9000 minioadmin minioadmin
