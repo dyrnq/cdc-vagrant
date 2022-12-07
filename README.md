@@ -23,7 +23,7 @@ Extract, Load, Transform (ELT) is a data integration process for transferring ra
     - [flink cdc](#flink-cdc)
       - [mysql](#mysql)
       - [postgres](#postgres)
-      - [sql-client.sh](#sql-clientsh)
+      - [cdc to es](#cdc-to-es)
       - [mysql additional test](#mysql-additional-test)
       - [cdc to doris](#cdc-to-doris)
   - [ref](#ref)
@@ -225,7 +225,9 @@ VALUES (default,10001,'Beijing','Shanghai',false),
        (default,10003,'Shanghai','Hangzhou',false);
 ```
 
-#### sql-client.sh
+#### cdc to es
+
+sql-client.sh
 
 enable checkpoints every 3 seconds.
 
@@ -347,6 +349,12 @@ DISTRIBUTED BY HASH(`id`) BUCKETS 3;
 ```
 
 sql-client.sh
+
+enable checkpoints every 3 seconds.
+
+```bash
+SET execution.checkpointing.interval = 3s;
+```
 
 ```bash
 
