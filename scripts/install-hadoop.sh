@@ -55,7 +55,7 @@ fi
 
 gosu hduser bash -c "ssh-keygen -t rsa -b 4096 -N '' -m PEM <<<$'\ny\n'"
 gosu hduser bash -c "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"
-gosu hduser bash -c "chmod 600 ~/.ssh/authorized_keys"
+gosu hduser bash -c "chmod 644 ~/.ssh/authorized_keys"
 ## 拷贝证书到其他hadoop集群机器
 
 sed -i "s@.*PasswordAuthentication.*@PasswordAuthentication yes@g" /etc/ssh/sshd_config
