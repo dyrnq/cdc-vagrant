@@ -10,30 +10,30 @@ fe_leader=${fe_leader:-}
 
 
 while [ $# -gt 0 ]; do
-	case "$1" in
-		--fe)
-			FLAG_FE=1
-			;;
-		--be)
-			FLAG_BE=1
-			;;
-		--fe-role)
-			fe_role="$2"
-			shift
-			;;
-		--fe-leader)
-			fe_leader="$2"
-			shift
-			;;
-		--iface|-i)
-			iface="$2"
-			shift
-			;;
-		--*)
-			echo "Illegal option $1"
-			;;
-	esac
-	shift $(( $# > 0 ? 1 : 0 ))
+    case "$1" in
+        --fe)
+            FLAG_FE=1
+            ;;
+        --be)
+            FLAG_BE=1
+            ;;
+        --fe-role)
+            fe_role="$2"
+            shift
+            ;;
+        --fe-leader)
+            fe_leader="$2"
+            shift
+            ;;
+        --iface|-i)
+            iface="$2"
+            shift
+            ;;
+        --*)
+            echo "Illegal option $1"
+            ;;
+    esac
+    shift $(( $# > 0 ? 1 : 0 ))
 done
 
 ip4=$(/sbin/ip -o -4 addr list "${iface}" | awk '{print $4}' |cut -d/ -f1 | head -n1);
@@ -41,24 +41,24 @@ ip4=$(/sbin/ip -o -4 addr list "${iface}" | awk '{print $4}' |cut -d/ -f1 | head
 
 
 is_fe() {
-	if [ -z "$FLAG_FE" ]; then
-		return 1
-	else
-		return 0
-	fi
+    if [ -z "$FLAG_FE" ]; then
+        return 1
+    else
+        return 0
+    fi
 }
 
 is_be() {
-	if [ -z "$FLAG_BE" ]; then
-		return 1
-	else
-		return 0
-	fi
+    if [ -z "$FLAG_BE" ]; then
+        return 1
+    else
+        return 0
+    fi
 }
 
 
 command_exists() {
-	command -v "$@" > /dev/null 2>&1
+    command -v "$@" > /dev/null 2>&1
 }
 
 fun_system() {
@@ -167,9 +167,9 @@ EOF
 
 systemctl daemon-reload
 if systemctl is-active doris_fe &>/dev/null; then
-	systemctl restart doris_fe
+    systemctl restart doris_fe
 else
-	systemctl enable --now doris_fe
+    systemctl enable --now doris_fe
 fi
 systemctl status -l doris_fe --no-pager
 
@@ -233,9 +233,9 @@ EOF
 
 systemctl daemon-reload
 if systemctl is-active doris_be &>/dev/null; then
-	systemctl restart doris_be
+    systemctl restart doris_be
 else
-	systemctl enable --now doris_be
+    systemctl enable --now doris_be
 fi
 systemctl status -l doris_be --no-pager
 

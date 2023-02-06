@@ -5,27 +5,27 @@ docker_ver="${docker_ver:-v20.10.21}"
 
 
 while [ $# -gt 0 ]; do
-	case "$1" in
-		--docker-ver)
-			if [[ $2 =~ ^v.* ]]; then docker_ver="${2}"; else docker_ver=v"${2}"; fi
-			shift
-			;;
-		--iface|-i)
-			iface="$2"
-			shift
-			;;
-		--*)
-			echo "Illegal option $1"
-			;;
-	esac
-	shift $(( $# > 0 ? 1 : 0 ))
+    case "$1" in
+        --docker-ver)
+            if [[ $2 =~ ^v.* ]]; then docker_ver="${2}"; else docker_ver=v"${2}"; fi
+            shift
+            ;;
+        --iface|-i)
+            iface="$2"
+            shift
+            ;;
+        --*)
+            echo "Illegal option $1"
+            ;;
+    esac
+    shift $(( $# > 0 ? 1 : 0 ))
 done
 
 ip4=$(/sbin/ip -o -4 addr list "${iface}" | awk '{print $4}' |cut -d/ -f1 | head -n1);
 
 
 command_exists() {
-	command -v "$@" > /dev/null 2>&1
+    command -v "$@" > /dev/null 2>&1
 }
 
 
@@ -147,7 +147,7 @@ EOF
 ## 加载linux内核模块
 
 if ! systemctl is-active systemd-modules-load.service >/dev/null 2>&1; then
-	systemctl enable systemd-modules-load.service
+    systemctl enable systemd-modules-load.service
 fi
 
 cat > /etc/modules-load.d/90-net.conf<<EOF
@@ -201,7 +201,7 @@ cat >/etc/docker/daemon.json <<EOF
     "live-restore": true,
     "exec-opts": ["native.cgroupdriver=systemd"],
     "registry-mirrors": [
-	    "https://docker.mirrors.ustc.edu.cn"
+        "https://docker.mirrors.ustc.edu.cn"
     ],
     "log-level": "info",
     "log-driver": "json-file",
@@ -212,9 +212,9 @@ cat >/etc/docker/daemon.json <<EOF
 EOF
 systemctl daemon-reload
 if systemctl is-active docker &>/dev/null; then
-	systemctl restart docker
+    systemctl restart docker
 else
-	systemctl enable --now docker
+    systemctl enable --now docker
 fi
 
 docker info

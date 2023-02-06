@@ -7,24 +7,24 @@ port="${port:-8000}"
 
 
 while [ $# -gt 0 ]; do
-	case "$1" in
-		--iface|-i)
-			iface="$2"
-			shift
-			;;
-		--cluster-ips|--ips|--sites)
-			cluster_ips="$2"
-			shift
-			;;
-		--port)
-			port="$2"
-			shift
-			;;
-		--*)
-			echo "Illegal option $1"
-			;;
-	esac
-	shift $(( $# > 0 ? 1 : 0 ))
+    case "$1" in
+        --iface|-i)
+            iface="$2"
+            shift
+            ;;
+        --cluster-ips|--ips|--sites)
+            cluster_ips="$2"
+            shift
+            ;;
+        --port)
+            port="$2"
+            shift
+            ;;
+        --*)
+            echo "Illegal option $1"
+            ;;
+    esac
+    shift $(( $# > 0 ? 1 : 0 ))
 done
 
 ip4=$(/sbin/ip -o -4 addr list "${iface}" | awk '{print $4}' |cut -d/ -f1 | head -n1);

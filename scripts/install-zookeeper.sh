@@ -6,21 +6,21 @@ cluster_ips="192.168.55.31,192.168.55.32,192.168.55.33"
 IFS=',' read -r -a iparr <<< ${cluster_ips}
 
 while [ $# -gt 0 ]; do
-	case "$1" in
-		--iface|-i)
-			iface="$2"
-			shift
-			;;
-		--cluster-ips|--ips)
-			cluster_ips="$2"
-			IFS=',' read -r -a iparr <<< ${cluster_ips}
-			shift
-			;;
-		--*)
-			echo "Illegal option $1"
-			;;
-	esac
-	shift $(( $# > 0 ? 1 : 0 ))
+    case "$1" in
+        --iface|-i)
+            iface="$2"
+            shift
+            ;;
+        --cluster-ips|--ips)
+            cluster_ips="$2"
+            IFS=',' read -r -a iparr <<< ${cluster_ips}
+            shift
+            ;;
+        --*)
+            echo "Illegal option $1"
+            ;;
+    esac
+    shift $(( $# > 0 ? 1 : 0 ))
 done
 
 ip4=$(/sbin/ip -o -4 addr list "${iface}" | awk '{print $4}' |cut -d/ -f1 | head -n1);
@@ -80,8 +80,8 @@ curl -fsSL http://mirrors.tencent.com/apache/zookeeper/zookeeper-3.8.0/apache-zo
 local _index="0";
 for i in "${!iparr[@]}"; do
    if [[ "${iparr[$i]}" = "${ip4}" ]]; then
-	   _index="${i}";
-	   break;
+       _index="${i}";
+       break;
    fi
 done
 
@@ -109,8 +109,8 @@ done
 local _index="0";
 for i in "${!iparr[@]}"; do
    if [[ "${iparr[$i]}" = "${ip4}" ]]; then
-	   _index="${i}";
-	   break;
+       _index="${i}";
+       break;
    fi
 done
 
@@ -138,9 +138,9 @@ EOF
 
 systemctl daemon-reload
 if systemctl is-active zookeeper &>/dev/null; then
-	systemctl restart zookeeper
+    systemctl restart zookeeper
 else
-	systemctl enable --now zookeeper
+    systemctl enable --now zookeeper
 fi
 systemctl status -l zookeeper --no-pager
 
