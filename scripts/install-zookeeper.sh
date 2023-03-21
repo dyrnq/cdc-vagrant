@@ -74,7 +74,7 @@ fun_install(){
 mkdir -p /opt/zookeeper/logs/
 mkdir -p /opt/zookeeper/data/
 
-curl -fsSL http://mirrors.tencent.com/apache/zookeeper/zookeeper-3.8.0/apache-zookeeper-3.8.0-bin.tar.gz | tar -xvz --strip-components 1 --directory /opt/zookeeper
+curl -fsSL http://mirrors.tencent.com/apache/zookeeper/zookeeper-3.8.1/apache-zookeeper-3.8.1-bin.tar.gz | tar -xvz --strip-components 1 --directory /opt/zookeeper
 
 
 local _index="0";
