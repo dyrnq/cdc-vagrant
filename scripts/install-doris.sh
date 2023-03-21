@@ -65,7 +65,7 @@ fun_system() {
 while true; do
     sed -i.bak 's/archive.ubuntu.com/mirrors.ustc.edu.cn/g' /etc/apt/sources.list;
     apt update -y;
-    apt install -y openjdk-11-jdk mysql-client-core-8.0 && java -version && break;
+    apt install -y openjdk-8-jdk mysql-client-core-8.0 xz-utils && java -version && break;
 done
 
 ## 关闭防火墙
@@ -113,10 +113,10 @@ done
 
 fun_fe(){
 local doris_fe_download_url=""
-doris_fe_download_url="https://mirrors.ustc.edu.cn/apache/doris/1.1/1.1.4-rc01/apache-doris-fe-1.1.4-bin.tar.gz"
+doris_fe_download_url="https://mirrors.ustc.edu.cn/apache/doris/1.2/1.2.3-rc02/apache-doris-fe-1.2.3-bin-x86_64.tar.xz"
 
 mkdir -p /opt/doris/fe
-curl -fsSL $doris_fe_download_url | tar -xvz --strip-components 1 --directory /opt/doris/fe
+curl -fsSL $doris_fe_download_url | tar -xvJ --strip-components 1 --directory /opt/doris/fe
 
 # store metadata, must be created before start FE.
 # Default value is ${DORIS_HOME}/doris-meta
@@ -182,14 +182,22 @@ local doris_be_download_url=""
 
 
 if grep avx2 < /proc/cpuinfo ; then
-    doris_be_download_url="https://mirrors.ustc.edu.cn/apache/doris/1.1/1.1.4-rc01/apache-doris-be-1.1.4-bin-x86_64.tar.gz"
+    doris_be_download_url="https://mirrors.ustc.edu.cn/apache/doris/1.2/1.2.3-rc02/apache-doris-be-1.2.3-bin-x86_64.tar.xz"
 else
-    doris_be_download_url="https://mirrors.ustc.edu.cn/apache/doris/1.1/1.1.4-rc01/apache-doris-be-1.1.4-bin-x86_64-noavx2.tar.gz"
+    doris_be_download_url="https://mirrors.ustc.edu.cn/apache/doris/1.2/1.2.3-rc02/apache-doris-be-1.2.3-bin-x86_64-noavx2.tar.xz"
 fi
 
 
 mkdir -p /opt/doris/be
-curl -fsSL $doris_be_download_url | tar -xvz --strip-components 1 --directory /opt/doris/be
+
+curl -fsSL -o /opt/doris/apache-doris-dependencies-bin-x86_64.tar.xz https://mirrors.ustc.edu.cn/apache/doris/1.2/1.2.3-rc02/apache-doris-dependencies-1.2.3-bin-x86_64.tar.xz
+
+rm -rf /tmp/apache-doris-dependencies
+mkdir /tmp/apache-doris-dependencies
+tar -xvJf /opt/doris/apache-doris-dependencies-bin-x86_64.tar.xz --strip-components 1 --directory /tmp/apache-doris-dependencies
+
+curl -fsSL $doris_be_download_url | tar -xvJ --strip-components 1 --directory /opt/doris/be
+/bin/cp -rvf /tmp/apache-doris-dependencies/java-udf-jar-with-dependencies.jar /opt/doris/be/lib
 
 # you can specify the storage medium of each root path, HDD or SSD
 # storage_root_path = /home/disk1/doris.HDD,50;/home/disk2/doris.SSD,1;/home/disk2/doris
@@ -214,6 +222,7 @@ Description=doris service
 After=network.target
 [Service]
 Type=simple
+Environment=JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 WorkingDirectory=/opt/doris/be
 ExecStart=/bin/bash -c "bin/start_be.sh"
 ExecStop=/bin/kill -s TERM \$MAINPID
@@ -247,9 +256,13 @@ systemctl status -l doris_be --no-pager
 
 
 fun_system
-is_fe && fun_fe
-is_be && fun_be
+if is_fe ; then
+    fun_fe
+fi
 
+if is_be ; then
+    fun_be
+fi
 
 # mysql -h 192.168.56.111 -P 9030 -u root 
 
