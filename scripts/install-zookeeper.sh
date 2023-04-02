@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null 2>&1 && pwd -P)
+# SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null 2>&1 && pwd -P)
 
 iface="${iface:-enp0s8}"
-cluster_ips="192.168.55.31,192.168.55.32,192.168.55.33"
-IFS=',' read -r -a iparr <<< ${cluster_ips}
+cluster_ips="${cluster_ips:-192.168.55.31,192.168.55.32,192.168.55.33}"
+
 
 while [ $# -gt 0 ]; do
     case "$1" in
@@ -13,7 +13,6 @@ while [ $# -gt 0 ]; do
             ;;
         --cluster-ips|--ips)
             cluster_ips="$2"
-            IFS=',' read -r -a iparr <<< ${cluster_ips}
             shift
             ;;
         --*)
@@ -70,6 +69,7 @@ EOF
 }
 
 fun_install(){
+IFS=',' read -r -a iparr <<< "${cluster_ips}"
 
 mkdir -p /opt/zookeeper/logs/
 mkdir -p /opt/zookeeper/data/
