@@ -64,6 +64,17 @@ cat > /etc/security/limits.conf <<'EOF'
 *       soft        memlock     32000
 *       hard        memlock     32000
 *       soft        msgqueue    8192000
+*       hard        msgqueue    8192000
+root       soft        core        unlimited
+root       hard        core        unlimited
+root       soft        nproc       1000000
+root       hard        nproc       1000000
+root       soft        nofile      1000000
+root       hard        nofile      1000000
+root       soft        memlock     32000
+root       hard        memlock     32000
+root       soft        msgqueue    8192000
+root       hard        msgqueue    8192000
 EOF
 
 }
@@ -74,7 +85,7 @@ IFS=',' read -r -a iparr <<< "${cluster_ips}"
 mkdir -p /opt/zookeeper/logs/
 mkdir -p /opt/zookeeper/data/
 
-curl -fsSL http://mirrors.tencent.com/apache/zookeeper/zookeeper-3.8.1/apache-zookeeper-3.8.1-bin.tar.gz | tar -xvz --strip-components 1 --directory /opt/zookeeper
+curl -fsSL http://mirrors.tencent.com/apache/zookeeper/zookeeper-3.8.4/apache-zookeeper-3.8.4-bin.tar.gz | tar -xvz --strip-components 1 --directory /opt/zookeeper
 
 
 local _index="0";
