@@ -111,7 +111,7 @@ fun_install(){
     mkdir -p ${hadoop_home}
     chown -R hduser:hadoop ${hadoop_home}
     echo "install hadoop .............."
-    gosu hduser bash -c "curl -fsSL https://mirrors.ustc.edu.cn/apache/hadoop/common/hadoop-3.3.4/hadoop-3.3.4.tar.gz | tar -xz --strip-components 1 --directory ${hadoop_home}"
+    gosu hduser bash -c "curl -fsSL https://mirrors.ustc.edu.cn/apache/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz | tar -xz --strip-components 1 --directory ${hadoop_home}"
 
     cat > /etc/profile.d/myhadoop.sh <<EOF
 export HADOOP_HOME=${hadoop_home}
