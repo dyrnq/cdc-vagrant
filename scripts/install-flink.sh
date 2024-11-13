@@ -4,13 +4,22 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null 2>&1 && pwd -P)
 iface="${iface:-enp0s8}"
 cluster_ips="192.168.55.31,192.168.55.32,192.168.55.33"
 IFS=',' read -r -a iparr <<< ${cluster_ips}
-
+flink_home="${flink_home:-/opt/flink}"
+ver="${ver:-1.20.0}"
 
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --iface|-i)
             iface="$2"
+            shift
+            ;;
+        --flink-home)
+            flink_home="$2"
+            shift
+            ;;
+        --version|--ver)
+            ver="$2"
             shift
             ;;
         --cluster-ips|--ips)
@@ -37,17 +46,17 @@ done
 }
 
 fun_install(){
-    flink_home="/opt/flink"
-    mkdir -p ${flink_home}
-    chown -R hduser:hadoop ${flink_home}
+    # flink_home="/opt/flink"
+    mkdir -p "${flink_home}"
+    chown -R hduser:hadoop "${flink_home}"
     echo "install flink .............."
-    gosu hduser bash -c "curl -f#SL https://mirrors.sustech.edu.cn/apache/flink/flink-1.20.0/flink-1.20.0-bin-scala_2.12.tgz | tar -xz --strip-components 1 --directory ${flink_home}"
+    gosu hduser bash -c "curl -f#SL https://mirrors.sustech.edu.cn/apache/flink/flink-${ver}/flink-${ver}-bin-scala_2.12.tgz | tar -xz --strip-components 1 --directory ${flink_home}"
     gosu hduser bash -c "mkdir -p ${flink_home}/plugins/flink-s3 && /bin/cp --force ${flink_home}/opt/flink-s3-fs-presto*.jar ${flink_home}/plugins/flink-s3"
     cat > /etc/profile.d/myflink.sh <<EOF
 export FLINK_HOME=${flink_home}
 export PATH=\$PATH:\$FLINK_HOME/bin:\$FLINK_HOME/sbin
 EOF
-    /bin/cp -r -v /vagrant/configs/flink/* ${flink_home}
+    /bin/cp -r -v /vagrant/configs/flink/* "${flink_home}"
 
     sed -i.bak \
         -e "s@.*rest\.address:.*@rest.address: $ip4@g" \
@@ -57,9 +66,9 @@ EOF
         -e "s@.*jobmanager\.rpc\.address:.*@jobmanager.rpc.address: $ip4@" \
         -e "s@.*jobmanager\.bind-host:.*@jobmanager.bind-host: 0.0.0.0@" \
         -e "s@_MINIO_VIP_@$ip4@" \
-        ${flink_home}/conf/flink-conf.yaml
+        "${flink_home}"/conf/flink-conf.yaml
     
-    chown -R hduser:hadoop ${flink_home}
+    chown -R hduser:hadoop "${flink_home}"
     # taskmanager.bind-host: localhost    
     # taskmanager.host: localhost
     # jobmanager.rpc.address: localhost
