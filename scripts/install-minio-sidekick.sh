@@ -30,7 +30,7 @@ done
 ip4=$(/sbin/ip -o -4 addr list "${iface}" | awk '{print $4}' |cut -d/ -f1 | head -n1);
 
 fun_install() {
-    curl -fSL -o /usr/local/bin/sidekick -# https://github.com/minio/sidekick/releases/download/v2.0.4/sidekick-linux-amd64
+    curl -fSL -o /usr/local/bin/sidekick -# https://ghp.ci/github.com/minio/sidekick/releases/download/v7.0.3/sidekick-linux-amd64
     chmod +x /usr/local/bin/sidekick
 
     mkdir -p /etc/default
