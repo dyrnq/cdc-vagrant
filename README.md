@@ -183,7 +183,7 @@ bash /vagrant/scripts/install-flink-cdc.sh
 this is an experimental environment of [基于 Flink CDC 构建 MySQL 和 Postgres 的 Streaming ETL](https://nightlies.apache.org/flink/flink-cdc-docs-release-3.2/docs/get-started/quickstart/mysql-to-doris/).
 
 
-[https://github.com/apache/doris/blob/master/samples/doris-demo/flink-demo-v1.1](https://github.com/apache/doris/blob/master/samples/doris-demo/flink-demo-v1.1/src/main/java/org/apache/doris/demo/flink/Cdc2DorisSQLDemo.java)
+
 
 
 ### flink-cdc version matrix
@@ -197,3 +197,4 @@ see <https://nightlies.apache.org/flink/flink-cdc-docs-master/docs/connectors/fl
 - [HDFS High Availability Using the Quorum Journal Manager](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)
 - [ResourceManager High Availability](https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/ResourceManagerHA.html)
 - [High Performance HTTP Sidecar Load Balancer](https://github.com/minio/sidekick)
+- [https://github.com/apache/doris/tree/master/samples/doris-demo](https://github.com/apache/doris/tree/master/samples/doris-demo)
