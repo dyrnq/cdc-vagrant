@@ -4,13 +4,22 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null 2>&1 && pwd -P)
 iface="${iface:-enp0s8}"
 cluster_ips="192.168.55.31,192.168.55.32,192.168.55.33"
 IFS=',' read -r -a iparr <<< ${cluster_ips}
-
+flink_cdc_home="${flink_cdc_home:-/opt/flink-cdc}"
+ver="${ver:-3.2.0}"
 
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --iface|-i)
             iface="$2"
+            shift
+            ;;
+        --flink-cdc-home)
+            flink_cdc_home="$2"
+            shift
+            ;;
+        --version|--ver)
+            ver="$2"
             shift
             ;;
         --cluster-ips|--ips)
@@ -37,12 +46,12 @@ done
 }
 
 fun_install(){
-    flink_cdc_home="/opt/flink-cdc"
-    mkdir -p ${flink_cdc_home}
-    chown -R hduser:hadoop ${flink_cdc_home}
+    # flink_cdc_home="/opt/flink-cdc"
+    mkdir -p "${flink_cdc_home}"
+    chown -R hduser:hadoop "${flink_cdc_home}"
     echo "install flink cdc ${flink_cdc_home} .............."
-    gosu hduser bash -c "curl -f#SL https://mirrors.ustc.edu.cn/apache/flink/flink-cdc-3.2.0/flink-cdc-3.2.0-bin.tar.gz | tar -xz --strip-components 1 --directory ${flink_cdc_home}"    
-    chown -R hduser:hadoop ${flink_cdc_home}
+    gosu hduser bash -c "curl -f#SL https://mirrors.ustc.edu.cn/apache/flink/flink-cdc-${ver}/flink-cdc-${ver}-bin.tar.gz | tar -xz --strip-components 1 --directory ${flink_cdc_home}"
+    chown -R hduser:hadoop "${flink_cdc_home}"
 }
 
 
