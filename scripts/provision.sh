@@ -42,6 +42,7 @@ echo "${HOSTNAME}"
 
 
 bash /vagrant/scripts/install-docker.sh
+usermod -aG docker vagrant
 bash /vagrant/scripts/hosts.sh
 
 
