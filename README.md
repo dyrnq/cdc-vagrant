@@ -147,8 +147,6 @@ mc admin user svcacct add --access-key "u5SybesIDVX9b6Pk" --secret-key "lOpH1v7k
 # mc admin user svcacct add --access-key "myuserserviceaccount" --secret-key "myuserserviceaccountpassword" myminio minioadmin
 ```
 
-[mc](https://github.com/minio/mc)
-
 > minio load balancer
 
 ```bash
@@ -181,10 +179,8 @@ bin/flink run /opt/flink/examples/streaming/WordCount.jar
 ### flink cdc
 
 ```bash
-bash /vagrant/scripts/install-flink-cdc.sh
+bash /vagrant/scripts/install-flink-cdc.sh --version 3.2.0 --flink-cdc-home /opt/flink-cdc
 ```
-
-this is an experimental environment of [基于 Flink CDC 构建 MySQL 和 Postgres 的 Streaming ETL](https://nightlies.apache.org/flink/flink-cdc-docs-release-3.2/docs/get-started/quickstart/mysql-to-doris/).
 
 ### flink-cdc version matrix
 
@@ -198,3 +194,4 @@ see <https://nightlies.apache.org/flink/flink-cdc-docs-master/docs/connectors/fl
 - [ResourceManager High Availability](https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/ResourceManagerHA.html)
 - [High Performance HTTP Sidecar Load Balancer](https://github.com/minio/sidekick)
 - [https://github.com/apache/doris/tree/master/samples/doris-demo](https://github.com/apache/doris/tree/master/samples/doris-demo)
+- [基于 Flink CDC 构建 MySQL 和 Postgres 的 Streaming ETL](https://nightlies.apache.org/flink/flink-cdc-docs-release-3.2/docs/get-started/quickstart/mysql-to-doris/)
