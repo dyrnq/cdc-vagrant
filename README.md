@@ -1,5 +1,19 @@
 # cdc-vagrant
 
+<!-- TOC -->
+
+- [cdc-vagrant](#cdc-vagrant)
+  - [introduce](#introduce)
+  - [architecture](#architecture)
+    - [zookeeper cluster](#zookeeper-cluster)
+    - [HDFS cluster and YARN cluster](#hdfs-cluster-and-yarn-cluster)
+    - [flink cluster](#flink-cluster)
+    - [flink cdc](#flink-cdc)
+    - [flink-cdc version matrix](#flink-cdc-version-matrix)
+  - [ref](#ref)
+
+<!-- /TOC -->
+
 ## introduce
 
 This project is for experiment of flink-cdc and doris.
@@ -41,19 +55,16 @@ Mode: follower
 Node count: 5
 ```
 
-
-
 ### HDFS cluster and YARN cluster
 
 | vm    | role                                 | ip             | xxx_home    |
 |-------|--------------------------------------|----------------|-------------|
-| vm116 | NameNode(active),zkfc, JournalNode   | 192.168.56.116 | /opt/hadoop |
-| vm117 | NameNode(standby),zkfc, JournalNode  | 192.168.56.117 | /opt/hadoop |
-| vm118 | NameNode(observer),zkfc, JournalNode | 192.168.56.118 | /opt/hadoop |
+| vm116 | NameNode, zkfc, JournalNode          | 192.168.56.116 | /opt/hadoop |
+| vm117 | NameNode, zkfc, JournalNode          | 192.168.56.117 | /opt/hadoop |
+| vm118 | NameNode, zkfc, JournalNode          | 192.168.56.118 | /opt/hadoop |
 | vm119 | DataNode                             | 192.168.56.119 | /opt/hadoop |
 | vm120 | DataNode                             | 192.168.56.120 | /opt/hadoop |
 | vm121 | DataNode                             | 192.168.56.121 | /opt/hadoop |
-
 
 | vm    | role     | ip             | xxx_home    |
 |-------|----------|----------------|-------------|
@@ -104,11 +115,7 @@ standby
 # yarn --daemon start nodemanager       //vm119 vm120 vm121
 ```
 
-### flink standalone cluster
-
-minio cluster and flink standalone cluster
-
-Reuse the above virtual machines due to hardware constraints.
+### flink cluster
 
 | vm    | role   | ip             | xxx_home   |
 |-------|--------|----------------|------------|
@@ -116,7 +123,6 @@ Reuse the above virtual machines due to hardware constraints.
 | vm117 | minio  | 192.168.56.117 | /opt/minio |
 | vm118 | minio  | 192.168.56.118 | /opt/minio |
 | vm119 | minio  | 192.168.56.119 | /opt/minio |
-
 
 | vm    | role                             | ip             | xxx_home   |
 |-------|----------------------------------|----------------|------------|
@@ -126,7 +132,6 @@ Reuse the above virtual machines due to hardware constraints.
 | vm119 | sidekick, flink(workers)         | 192.168.56.119 | /opt/flink |
 | vm120 | sidekick, flink(workers)         | 192.168.56.120 | /opt/flink |
 | vm121 | sidekick, flink(workers)         | 192.168.56.121 | /opt/flink |
-
 
 > minio client
 
@@ -155,7 +160,6 @@ mc mb myminio/flink
 mc mb myminio/flink-state
 ```
 
-
 ```bash
 # vm116 vm117 vm118 vm119 vm120 vm121
 bash /vagrant/scripts/install-flink.sh
@@ -181,10 +185,6 @@ bash /vagrant/scripts/install-flink-cdc.sh
 ```
 
 this is an experimental environment of [基于 Flink CDC 构建 MySQL 和 Postgres 的 Streaming ETL](https://nightlies.apache.org/flink/flink-cdc-docs-release-3.2/docs/get-started/quickstart/mysql-to-doris/).
-
-
-
-
 
 ### flink-cdc version matrix
 
