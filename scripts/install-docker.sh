@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
 
 iface="enp0s8"
-docker_ver="${docker_ver:-v20.10.21}"
+
 
 
 while [ $# -gt 0 ]; do
     case "$1" in
-        --docker-ver)
-            if [[ $2 =~ ^v.* ]]; then docker_ver="${2}"; else docker_ver=v"${2}"; fi
-            shift
-            ;;
         --iface|-i)
             iface="$2"
             shift
@@ -184,7 +180,7 @@ while true ; do
   break
 done
 
-local docker_ver_nover="${docker_ver:1}"
+
 
 
 ## https://docs.docker.com/engine/install/ubuntu/
@@ -197,11 +193,7 @@ echo \
 
 apt update -y && apt-cache madison docker-ce
 
-#20.10.21~3-0~ubuntu-focal
-# local distributor
-# local codename
-# distributor="$(lsb_release -is | tr '[:upper:]' '[:lower:]')"
-# codename="$(lsb_release -cs)"
+
 apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
 # apt-get install docker-compose-plugin
