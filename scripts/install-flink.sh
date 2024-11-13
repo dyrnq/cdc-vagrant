@@ -41,7 +41,7 @@ fun_install(){
     mkdir -p ${flink_home}
     chown -R hduser:hadoop ${flink_home}
     echo "install flink .............."
-    gosu hduser bash -c "curl -fsSL https://mirrors.sustech.edu.cn/apache/flink/flink-1.20.0/flink-1.20.0-bin-scala_2.12.tgz | tar -xz --strip-components 1 --directory ${flink_home}"
+    gosu hduser bash -c "curl -f#SL https://mirrors.sustech.edu.cn/apache/flink/flink-1.20.0/flink-1.20.0-bin-scala_2.12.tgz | tar -xz --strip-components 1 --directory ${flink_home}"
     gosu hduser bash -c "mkdir -p ${flink_home}/plugins/flink-s3 && /bin/cp --force ${flink_home}/opt/flink-s3-fs-presto*.jar ${flink_home}/plugins/flink-s3"
     cat > /etc/profile.d/myflink.sh <<EOF
 export FLINK_HOME=${flink_home}
@@ -59,7 +59,7 @@ EOF
         -e "s@_MINIO_VIP_@$ip4@" \
         ${flink_home}/conf/flink-conf.yaml
     
-
+    chown -R hduser:hadoop ${flink_home}
     # taskmanager.bind-host: localhost    
     # taskmanager.host: localhost
     # jobmanager.rpc.address: localhost

@@ -40,85 +40,21 @@ while true; do
     apt install -y openjdk-11-jdk gosu jq expect && java -version && break;
 done
 
-
-timedatectl set-timezone "Asia/Shanghai"
-
-groupadd -r hadoop --gid=4000 || true
-useradd -m -g hadoop --uid=4000 --shell=/bin/bash hduser || true
-echo "hduser:ppp" | sudo chpasswd
-if [ -d /etc/sudoers.d ] ; then
-    echo "hduser ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/hduser
-else
-    grep "hduser" /etc/sudoers || echo "hduser ALL=(ALL) NOPASSWD:ALL" /etc/sudoers
-fi
-
-
-gosu hduser bash -c "ssh-keygen -t rsa -b 4096 -N '' -m PEM <<<$'\ny\n'"
-gosu hduser bash -c "cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys"
-gosu hduser bash -c "chmod 644 ~/.ssh/authorized_keys"
-## 拷贝证书到其他hadoop集群机器
-
-sed -i "s@.*PasswordAuthentication.*@PasswordAuthentication yes@g" /etc/ssh/sshd_config
-systemctl restart sshd
-
-sleep 4s;
-
-for e in "${iparr[@]}" ;do
-    if [ "$e" = "$ip4" ]; then
-        continue
-    else
-        (
-
-
-        while true; do
-            sleep 2s && echo "wait for ${e} 22" && nc -nvz "${e}" 22 && break
-        done
-
-
-        while true; do
-
-
-cat > /tmp/auto_ssh_copy_id.sh << EOF
-set timeout -1;
-spawn ssh-copy-id -p 22 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null hduser@${e};
-expect {
-    *(yes/no)* {send -- yes\r;exp_continue;}
-    *assword:* {send -- ppp\r;exp_continue;}
-    eof        {exit 0;}
 }
-EOF
 
-
-            echo "ssh-copy-id $e" && sleep 2s && gosu hduser expect -f /tmp/auto_ssh_copy_id.sh && break;
-        done
-        )
-    fi   
-done
-
-for e in "${iparr[@]}" ;do
-    tmpn=$(echo -n "${e}" | awk -F "." '{print $NF}');
-    sed -i "/$tmpn/d" /etc/hosts
-    grep "${e}" /etc/hosts || echo "${e}" "$hostname_prefix${tmpn}" >> /etc/hosts;
-done
-
-
-cat /etc/hosts
-
-
-}
 fun_install(){
     hadoop_home="/opt/hadoop"
     mkdir -p ${hadoop_home}
     chown -R hduser:hadoop ${hadoop_home}
     echo "install hadoop .............."
-    gosu hduser bash -c "curl -fsSL https://mirrors.ustc.edu.cn/apache/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz | tar -xz --strip-components 1 --directory ${hadoop_home}"
+    gosu hduser bash -c "curl -f#SL https://mirrors.ustc.edu.cn/apache/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz | tar -xz --strip-components 1 --directory ${hadoop_home}"
 
     cat > /etc/profile.d/myhadoop.sh <<EOF
 export HADOOP_HOME=${hadoop_home}
 export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin
 EOF
 
-    /bin/cp -r /vagrant/configs/hadoop/* ${hadoop_home}
+    /bin/cp -r -v /vagrant/configs/hadoop/* ${hadoop_home}
 
     mkdir -p /data/hadoop/tmp
     chown -R hduser:hadoop /data/hadoop

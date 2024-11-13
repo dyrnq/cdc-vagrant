@@ -124,7 +124,7 @@ high-availability.storageDir: s3://flink/ha
 # setup. This must be a list of the form:
 # "host1:clientPort,host2:clientPort,..." (default clientPort: 2181)
 #
-high-availability.zookeeper.quorum: vm116:2181,vm117:2181,vm118:2181
+high-availability.zookeeper.quorum: vm101:2181,vm102:2181,vm103:2181
 
 
 # ACL options are based on https://zookeeper.apache.org/doc/r3.1.2/zookeeperProgrammers.html#sc_BuiltinACLSchemes

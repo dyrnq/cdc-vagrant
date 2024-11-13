@@ -36,6 +36,35 @@ Streaming ETL (Extract, Transform, Load) is the processing and movement of real-
 
 ## architecture
 
+### zookeeper cluster
+
+| vm    | role      | ip             | xxx_home       |
+|-------|-----------|----------------|----------------|
+| vm101 | zookeeper | 192.168.56.101 | /opt/zookeeper |
+| vm102 | zookeeper | 192.168.56.102 | /opt/zookeeper |
+| vm103 | zookeeper | 192.168.56.103 | /opt/zookeeper |
+
+```bash
+cd /opt/zookeeper
+./bin/zkServer.sh status
+```
+
+```bash
+echo stat | nc 127.0.0.1 2181
+Zookeeper version: 3.8.4-9316c2a7a97e1666d8f4593f34dd6fc36ecc436c, built on 2024-02-12 22:16 UTC
+Clients:
+ /127.0.0.1:39370[0](queued=0,recved=1,sent=0)
+
+Latency min/avg/max: 0/6.375/41
+Received: 10
+Sent: 9
+Connections: 1
+Outstanding: 0
+Zxid: 0x100000003
+Mode: follower
+Node count: 5
+```
+
 ### doris cluster
 
 | vm    | role                                               | ip             | xxx_home       |
@@ -46,16 +75,66 @@ Streaming ETL (Extract, Transform, Load) is the processing and movement of real-
 | vm114 | doris BE                                           | 192.168.56.114 | /opt/doris/be/ |
 | vm115 | doris BE                                           | 192.168.56.115 | /opt/doris/be/ |
 
-### hdfs cluster and yarn cluster
+### HDFS cluster and YARN cluster
 
-| vm    | role                                               | ip             | xxx_home       |
-|-------|----------------------------------------------------|----------------|----------------|
-| vm116 | hdfs: NameNode(active),zkfc, yarn: RM, zookeeper   | 192.168.56.116 | /opt/hadoop    |
-| vm117 | hdfs: NameNode(standby),zkfc, yarn: RM, zookeeper  | 192.168.56.117 | /opt/hadoop    |
-| vm118 | hdfs: NameNode(observer),zkfc, yarn: RM, zookeeper | 192.168.56.118 | /opt/hadoop    |
-| vm119 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.119 | /opt/hadoop    |
-| vm120 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.120 | /opt/hadoop    |
-| vm121 | hdfs: DataNode, JournalNode, yarn: NM              | 192.168.56.121 | /opt/hadoop    |
+| vm    | role                                 | ip             | xxx_home    |
+|-------|--------------------------------------|----------------|-------------|
+| vm116 | NameNode(active),zkfc, JournalNode   | 192.168.56.116 | /opt/hadoop |
+| vm117 | NameNode(standby),zkfc, JournalNode  | 192.168.56.117 | /opt/hadoop |
+| vm118 | NameNode(observer),zkfc, JournalNode | 192.168.56.118 | /opt/hadoop |
+| vm119 | DataNode                             | 192.168.56.119 | /opt/hadoop |
+| vm120 | DataNode                             | 192.168.56.120 | /opt/hadoop |
+| vm121 | DataNode                             | 192.168.56.121 | /opt/hadoop |
+
+
+| vm    | role     | ip             | xxx_home    |
+|-------|----------|----------------|-------------|
+| vm116 | yarn: RM | 192.168.56.116 | /opt/hadoop |
+| vm117 | yarn: RM | 192.168.56.117 | /opt/hadoop |
+| vm118 | yarn: RM | 192.168.56.118 | /opt/hadoop |
+| vm119 | yarn: NM | 192.168.56.119 | /opt/hadoop |
+| vm120 | yarn: NM | 192.168.56.120 | /opt/hadoop |
+| vm121 | yarn: NM | 192.168.56.121 | /opt/hadoop |
+
+```bash
+###########################################################
+# 以下所有操作都需要在hduser用户下执行
+# su -l hduser
+###########################################################
+# vm116
+# hdfs --daemon start journalnode
+# hdfs namenode -format (执行一次)
+# hdfs zkfc -formatZK (执行一次)
+# hdfs --daemon start namenode && hdfs --daemon start zkfc
+
+
+
+# vm117 vm118
+# hdfs --daemon start journalnode
+# hdfs namenode -bootstrapStandby （执行一次）
+# hdfs --daemon start namenode && hdfs --daemon start zkfc
+
+
+## test hdfs HA
+(
+hdfs haadmin -getServiceState nn1
+hdfs haadmin -getServiceState nn2
+hdfs haadmin -getServiceState nn3
+)
+
+active
+standby
+standby
+
+
+# vm119 vm120 vm121
+# hdfs --daemon start datanode
+```
+
+```bash
+# yarn --daemon start resourcemanager   //vm116 vm117 vm118
+# yarn --daemon start nodemanager       //vm119 vm120 vm121
+```
 
 ### flink standalone cluster
 
@@ -63,74 +142,25 @@ minio cluster and flink standalone cluster
 
 Reuse the above virtual machines due to hardware constraints.
 
-| vm    | role                                                        | ip             | xxx_home   |
-|-------|-------------------------------------------------------------|----------------|------------|
-| vm116 | docker and compose, minio, sidekick, flink(masters+workers) | 192.168.56.116 | /opt/flink |
-| vm117 | docker and compose, minio, sidekick, flink(masters+workers) | 192.168.56.117 | /opt/flink |
-| vm118 | docker and compose, minio, sidekick, flink(masters+workers) | 192.168.56.118 | /opt/flink |
-| vm119 | docker and compose, minio, sidekick, flink(workers)         | 192.168.56.119 | /opt/flink |
-| vm120 | docker and compose, sidekick, flink(workers)                | 192.168.56.120 | /opt/flink |
-| vm121 | docker and compose, sidekick, flink(workers)                | 192.168.56.121 | /opt/flink |
-
-## Usage
-
-### HDFS HA
-
-```bash
+| vm    | role   | ip             | xxx_home   |
+|-------|--------|----------------|------------|
+| vm116 | minio  | 192.168.56.116 | /opt/minio |
+| vm117 | minio  | 192.168.56.117 | /opt/minio |
+| vm118 | minio  | 192.168.56.118 | /opt/minio |
+| vm119 | minio  | 192.168.56.119 | /opt/minio |
 
 
+| vm    | role                             | ip             | xxx_home   |
+|-------|----------------------------------|----------------|------------|
+| vm116 | sidekick, flink(masters+workers) | 192.168.56.116 | /opt/flink |
+| vm117 | sidekick, flink(masters+workers) | 192.168.56.117 | /opt/flink |
+| vm118 | sidekick, flink(masters+workers) | 192.168.56.118 | /opt/flink |
+| vm119 | sidekick, flink(workers)         | 192.168.56.119 | /opt/flink |
+| vm120 | sidekick, flink(workers)         | 192.168.56.120 | /opt/flink |
+| vm121 | sidekick, flink(workers)         | 192.168.56.121 | /opt/flink |
 
 
-# vm116
-# hdfs namenode -format (执行一次)
-# hdfs --daemon start namenode (依赖QJM，需启动 hdfs --daemon start journalnode)
-# hdfs zkfc -formatZK (执行一次)
-# hdfs --daemon start zkfc
-
-
-# vm117
-# hdfs namenode -bootstrapStandby （执行一次）
-# hdfs --daemon start namenode (依赖QJM，需启动 hdfs --daemon start journalnode)
-# hdfs --daemon start zkfc
-
-# vm118
-# hdfs namenode -bootstrapStandby （执行一次）
-# hdfs --daemon start namenode (依赖QJM，需启动 hdfs --daemon start journalnode)
-# hdfs --daemon start zkfc
-
-# hduser@vm116:~$ hdfs haadmin -getServiceState nn1
-# standby
-# hduser@vm116:~$ hdfs haadmin -getServiceState nn2
-# active
-# hduser@vm116:~$ hdfs haadmin -getServiceState nn3
-# standby
-
-
-# vm119 vm120 vm121
-# hdfs --daemon start journalnode
-# hdfs --daemon start datanode
-```
-
-### YARN HA
-
-```bash
-# yarn --daemon start resourcemanager   //vm116 vm117 vm118
-# yarn --daemon start nodemanager       //vm119 vm120 vm121
-```
-
-### minio HA
-
-#### minio server
-
-```bash
-# vm116 vm117 vm118 vm119
-bash /vagrant/scripts/install-docker.sh
-bash /vagrant/scripts/install-minio.sh
-```
-
-ref [docker-compose.yaml](https://raw.githubusercontent.com/minio/minio/master/docs/orchestration/docker-compose/docker-compose.yaml)
-
-#### minio client
+> minio client
 
 ```bash
 curl -o /usr/local/bin/mc -# -fSL https://dl.min.io/client/mc/release/linux-amd64/mc
@@ -140,41 +170,43 @@ mc --help
 
 ```bash
 mc alias set myminio http://localhost:9000 minioadmin minioadmin
-# mc admin user svcacct add --access-key "myuserserviceaccount" --secret-key "myuserserviceaccountpassword" myminio minioadmin
 mc admin user svcacct add --access-key "u5SybesIDVX9b6Pk" --secret-key "lOpH1v7kdM6H8NkPu1H2R6gLc9jcsmWM" myminio minioadmin
+# mc admin user svcacct add --access-key "myuserserviceaccount" --secret-key "myuserserviceaccountpassword" myminio minioadmin
 ```
 
 [mc](https://github.com/minio/mc)
 
-#### minio load balancer
+> minio load balancer
 
 ```bash
 bash /vagrant/scripts/install-minio-sidekick.sh --port "18000" --sites "http://vm{116...119}:9000"
 ```
 
-[High Performance HTTP Sidecar Load Balancer](https://github.com/minio/sidekick)
+```bash
+mc mb myminio/flink
+mc mb myminio/flink-state
+```
 
-### flink standalone HA
 
 ```bash
-# vm116 vm117 vm118 vm119
+# vm116 vm117 vm118 vm119 vm120 vm121
 bash /vagrant/scripts/install-flink.sh
 # https://blog.csdn.net/hiliang521/article/details/126860098
 
 su -l hduser
+cd /opt/flink
+
 ## start-cluster
-start-cluster.sh
+bin/start-cluster.sh
 ## stop-cluster
-stop-cluster.sh
-## 
-jobmanager.sh start
-##
-taskmanager.sh start
+bin/stop-cluster.sh
+
+
+
+bin/flink run /opt/flink/examples/streaming/WordCount.jar
 ```
 
-```bash
-flink run /opt/flink/examples/streaming/WordCount.jar  --input /opt/flink/conf/flink-conf.yaml
-```
+## Usage
 
 ### flink cdc
 
@@ -427,3 +459,4 @@ INSERT INTO doris_test_sink select id,name from cdc_test_source;
 - [HDFS High Availability](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithNFS.html)
 - [HDFS High Availability Using the Quorum Journal Manager](https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)
 - [ResourceManager High Availability](https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/ResourceManagerHA.html)
+- [High Performance HTTP Sidecar Load Balancer](https://github.com/minio/sidekick)

@@ -58,7 +58,7 @@
 
     <property>
         <name>dfs.namenode.shared.edits.dir</name>
-        <value>qjournal://vm119:8485;vm120:8485;vm121:8485/mycluster</value>
+        <value>qjournal://vm116:8485;vm117:8485;vm118:8485/mycluster</value>
     </property>
     <property>
         <name>dfs.client.failover.proxy.provider.mycluster</name>
