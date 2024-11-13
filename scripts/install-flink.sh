@@ -41,21 +41,23 @@ fun_install(){
     mkdir -p ${flink_home}
     chown -R hduser:hadoop ${flink_home}
     echo "install flink .............."
-    gosu hduser bash -c "curl -fsSL https://mirrors.sustech.edu.cn/apache/flink/flink-1.16.0/flink-1.16.0-bin-scala_2.12.tgz | tar -xz --strip-components 1 --directory ${flink_home}"
+    gosu hduser bash -c "curl -fsSL https://mirrors.sustech.edu.cn/apache/flink/flink-1.20.0/flink-1.20.0-bin-scala_2.12.tgz | tar -xz --strip-components 1 --directory ${flink_home}"
     gosu hduser bash -c "mkdir -p ${flink_home}/plugins/flink-s3 && /bin/cp --force ${flink_home}/opt/flink-s3-fs-presto*.jar ${flink_home}/plugins/flink-s3"
     cat > /etc/profile.d/myflink.sh <<EOF
 export FLINK_HOME=${flink_home}
 export PATH=\$PATH:\$FLINK_HOME/bin:\$FLINK_HOME/sbin
 EOF
-    /bin/cp -r /vagrant/configs/flink/* ${flink_home}
+    /bin/cp -r -v /vagrant/configs/flink/* ${flink_home}
 
-    sed -i "s@.*rest\.address:.*@rest.address: $ip4@g" ${flink_home}/conf/flink-conf.yaml
-    sed -i "s@.*rest\.bind-address:.*@rest.bind-address: 0.0.0.0@" ${flink_home}/conf/flink-conf.yaml
-    sed -i "s@.*taskmanager\.host:.*@taskmanager.host: $ip4@" ${flink_home}/conf/flink-conf.yaml
-    sed -i "s@.*taskmanager\.bind-host:.*@taskmanager.bind-host: 0.0.0.0@" ${flink_home}/conf/flink-conf.yaml
-    sed -i "s@.*jobmanager\.rpc\.address:.*@jobmanager.rpc.address: $ip4@" ${flink_home}/conf/flink-conf.yaml
-    sed -i "s@.*jobmanager\.bind-host:.*@jobmanager.bind-host: 0.0.0.0@" ${flink_home}/conf/flink-conf.yaml
-    sed -i "s@_MINIO_VIP_@$ip4@" ${flink_home}/conf/flink-conf.yaml
+    sed -i.bak \
+        -e "s@.*rest\.address:.*@rest.address: $ip4@g" \
+        -e "s@.*rest\.bind-address:.*@rest.bind-address: 0.0.0.0@" \
+        -e "s@.*taskmanager\.host:.*@taskmanager.host: $ip4@" \
+        -e "s@.*taskmanager\.bind-host:.*@taskmanager.bind-host: 0.0.0.0@" \
+        -e "s@.*jobmanager\.rpc\.address:.*@jobmanager.rpc.address: $ip4@" \
+        -e "s@.*jobmanager\.bind-host:.*@jobmanager.bind-host: 0.0.0.0@" \
+        -e "s@_MINIO_VIP_@$ip4@" \
+        ${flink_home}/conf/flink-conf.yaml
     
 
     # taskmanager.bind-host: localhost    
