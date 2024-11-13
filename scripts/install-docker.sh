@@ -141,6 +141,17 @@ cat > /etc/security/limits.conf <<'EOF'
 *       soft        memlock     32000
 *       hard        memlock     32000
 *       soft        msgqueue    8192000
+*       hard        msgqueue    8192000
+root       soft        core        unlimited
+root       hard        core        unlimited
+root       soft        nproc       1000000
+root       hard        nproc       1000000
+root       soft        nofile      1000000
+root       hard        nofile      1000000
+root       soft        memlock     32000
+root       hard        memlock     32000
+root       soft        msgqueue    8192000
+root       hard        msgqueue    8192000
 EOF
 
 
@@ -187,13 +198,13 @@ echo \
 apt update -y && apt-cache madison docker-ce
 
 #20.10.21~3-0~ubuntu-focal
-local distributor
-local codename
-distributor="$(lsb_release -is | tr '[:upper:]' '[:lower:]')"
-codename="$(lsb_release -cs)"
-apt-get -y install docker-ce=5:${docker_ver_nover}~3-0~${distributor}-${codename}
+# local distributor
+# local codename
+# distributor="$(lsb_release -is | tr '[:upper:]' '[:lower:]')"
+# codename="$(lsb_release -cs)"
+apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-apt-get install docker-compose-plugin
+# apt-get install docker-compose-plugin
 
 mkdir -p /etc/docker && \
 cat >/etc/docker/daemon.json <<EOF
@@ -201,7 +212,7 @@ cat >/etc/docker/daemon.json <<EOF
     "live-restore": true,
     "exec-opts": ["native.cgroupdriver=systemd"],
     "registry-mirrors": [
-        "https://docker.mirrors.ustc.edu.cn"
+        "https://docker.m.daocloud.io"
     ],
     "log-level": "info",
     "log-driver": "json-file",
