@@ -4,8 +4,8 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null 2>&1 && pwd -P)
 iface="${iface:-enp0s8}"
 cluster_ips="192.168.55.31,192.168.55.32,192.168.55.33"
 IFS=',' read -r -a iparr <<< ${cluster_ips}
-hostname_prefix="vm"
-
+hadoop_home="${hadoop_home:-/opt/hadoop}"
+ver="${ver:-3.3.5}"
 
 
 while [ $# -gt 0 ]; do
@@ -14,8 +14,12 @@ while [ $# -gt 0 ]; do
             iface="$2"
             shift
             ;;
-        --hostname-prefix)
-            hostname_prefix="$2"
+        --hadoop-home)
+            hadoop_home="$2"
+            shift
+            ;;
+        --version|--ver)
+            ver="$2"
             shift
             ;;
         --cluster-ips|--ips)
@@ -43,18 +47,18 @@ done
 }
 
 fun_install(){
-    hadoop_home="/opt/hadoop"
-    mkdir -p ${hadoop_home}
-    chown -R hduser:hadoop ${hadoop_home}
+    # hadoop_home="/opt/hadoop"
+    mkdir -p "${hadoop_home}"
+    chown -R hduser:hadoop "${hadoop_home}"
     echo "install hadoop .............."
-    gosu hduser bash -c "curl -f#SL https://mirrors.ustc.edu.cn/apache/hadoop/common/hadoop-3.3.5/hadoop-3.3.5.tar.gz | tar -xz --strip-components 1 --directory ${hadoop_home}"
+    gosu hduser bash -c "curl -f#SL https://mirrors.ustc.edu.cn/apache/hadoop/common/hadoop-${ver}/hadoop-${ver}.tar.gz | tar -xz --strip-components 1 --directory ${hadoop_home}"
 
     cat > /etc/profile.d/myhadoop.sh <<EOF
 export HADOOP_HOME=${hadoop_home}
 export PATH=\$PATH:\$HADOOP_HOME/bin:\$HADOOP_HOME/sbin
 EOF
 
-    /bin/cp -r -v /vagrant/configs/hadoop/* ${hadoop_home}
+    /bin/cp -r -v /vagrant/configs/hadoop/* "${hadoop_home}"
 
     mkdir -p /data/hadoop/tmp
     chown -R hduser:hadoop /data/hadoop
