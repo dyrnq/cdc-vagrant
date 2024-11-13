@@ -3,12 +3,16 @@
 
 iface="${iface:-enp0s8}"
 cluster_ips="${cluster_ips:-192.168.55.31,192.168.55.32,192.168.55.33}"
-
+ver="${ver:-3.8.4}"
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --iface|-i)
             iface="$2"
+            shift
+            ;;
+        --version|--ver)
+            ver="$2"
             shift
             ;;
         --cluster-ips|--ips)
@@ -85,7 +89,7 @@ IFS=',' read -r -a iparr <<< "${cluster_ips}"
 mkdir -p /opt/zookeeper/logs/
 mkdir -p /opt/zookeeper/data/
 
-curl -fsSL http://mirrors.tencent.com/apache/zookeeper/zookeeper-3.8.4/apache-zookeeper-3.8.4-bin.tar.gz | tar -xvz --strip-components 1 --directory /opt/zookeeper
+curl -fsSL http://mirrors.tencent.com/apache/zookeeper/zookeeper-"${ver}"/apache-zookeeper-"${ver}"-bin.tar.gz | tar -xvz --strip-components 1 --directory /opt/zookeeper
 
 
 local _index="0";
