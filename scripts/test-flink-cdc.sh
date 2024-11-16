@@ -8,9 +8,12 @@ pushd "${SCRIPT_DIR}"/../flink-cdc-doris || exit 1
 
 
 
-ulimit -n 655350 || true
+# ulimit -n 655350 || true
+# swapoff -a || true
+# sysctl -w vm.max_map_count=2000000 || true
 
-# ./launch.sh -d
+
+./launch.sh -d
 
 
 
