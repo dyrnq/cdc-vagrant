@@ -64,3 +64,6 @@ if [ -f "/etc/ssh/sshd_config.d/60-cloudimg-settings.conf" ]; then
     sed -i "s|^PasswordAuthentication.*|PasswordAuthentication yes|g" /etc/ssh/sshd_config.d/60-cloudimg-settings.conf
     systemctl restart sshd
 fi
+
+sysctl -w vm.max_map_count=2000000
+echo madvise > /sys/kernel/mm/transparent_hugepage/enabled
