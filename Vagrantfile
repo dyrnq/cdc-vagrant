@@ -16,13 +16,13 @@ Vagrant.configure("2") do |config|
     # insecure_private_key download from https://github.com/hashicorp/vagrant/blob/master/keys/vagrant
     config.ssh.private_key_path = "insecure_private_key"
 
-    group_m = {
+    zoo_m = {
         'vm101'   => '192.168.56.101',
         'vm102'   => '192.168.56.102',
         'vm103'   => '192.168.56.103',
     }
 
-    group_m.each do |name, ip|
+    zoo_m.each do |name, ip|
         config.vm.define name do |machine|
             machine.vm.network "private_network", ip: ip
 
@@ -46,12 +46,7 @@ SHELL
     end
 
 
-    my_machines = {
-        'vm111'   => '192.168.56.111',
-        'vm112'   => '192.168.56.112',
-        'vm113'   => '192.168.56.113',
-        'vm114'   => '192.168.56.114',
-        'vm115'   => '192.168.56.115',
+    hadoop_machines = {
         'vm116'   => '192.168.56.116',
         'vm117'   => '192.168.56.117',
         'vm118'   => '192.168.56.118',
@@ -60,7 +55,7 @@ SHELL
         'vm121'   => '192.168.56.121',
     }
 
-    my_machines.each do |name, ip|
+    hadoop_machines.each do |name, ip|
         config.vm.define name do |machine|
             machine.vm.network "private_network", ip: ip
 
@@ -90,6 +85,32 @@ SHELL
         end
     end
 
+
+    cdc_machines = {
+        'vm211'   => '192.168.56.211',
+    }
+
+    cdc_machines.each do |name, ip|
+        config.vm.define name do |machine|
+            machine.vm.network "private_network", ip: ip
+
+            machine.vm.hostname = name
+            machine.vm.provider :virtualbox do |vb|
+                vb.name = name  
+                vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+                vb.customize ["modifyvm", :id, "--vram", "32"]
+                vb.customize ["modifyvm", :id, "--ioapic", "on"]
+                vb.customize ["modifyvm", :id, "--cpus", "4"]
+                vb.customize ["modifyvm", :id, "--memory", "12288"]
+            end
+
+            machine.vm.provision "shell", path: "scripts/provision.sh"
+            machine.vm.provision "shell", inline: <<-SHELL
+                bash /vagrant/scripts/test-flink-cdc.sh
+SHELL
+            
+        end
+    end
 
 
 

@@ -182,6 +182,88 @@ bin/flink run /opt/flink/examples/streaming/WordCount.jar
 bash /vagrant/scripts/install-flink-cdc.sh --version 3.2.0 --flink-cdc-home /opt/flink-cdc
 ```
 
+vagrant up vm211
+
+```bash
+cd /opt/flink-cdc
+docker compose exec doris-fe mysql -uroot -P9030 -h127.0.0.1 -e "show backends; show frontends;"
+
+docker compose exec doris-fe mysql -uroot -P9030 -h127.0.0.1 -e "CREATE DATABASE app_db;"
+docker compose exec mysql mysql -uroot -p123456
+```
+```sql
+-- create database
+CREATE DATABASE app_db;
+
+USE app_db;
+
+-- create orders table
+CREATE TABLE `orders` (
+`id` INT NOT NULL,
+`price` DECIMAL(10,2) NOT NULL,
+PRIMARY KEY (`id`)
+);
+
+-- insert records
+INSERT INTO `orders` (`id`, `price`) VALUES (1, 4.00);
+INSERT INTO `orders` (`id`, `price`) VALUES (2, 100.00);
+
+-- create shipments table
+CREATE TABLE `shipments` (
+`id` INT NOT NULL,
+`city` VARCHAR(255) NOT NULL,
+PRIMARY KEY (`id`)
+);
+
+-- insert records
+INSERT INTO `shipments` (`id`, `city`) VALUES (1, 'beijing');
+INSERT INTO `shipments` (`id`, `city`) VALUES (2, 'xian');
+
+-- create products table
+CREATE TABLE `products` (
+`id` INT NOT NULL,
+`product` VARCHAR(255) NOT NULL,
+PRIMARY KEY (`id`)
+);
+
+-- insert records
+INSERT INTO `products` (`id`, `product`) VALUES (1, 'Beer');
+INSERT INTO `products` (`id`, `product`) VALUES (2, 'Cap');
+INSERT INTO `products` (`id`, `product`) VALUES (3, 'Peanut');
+```
+
+
+
+```bash
+cat <<EOF > ~/mysql-to-doris.yaml
+source:
+  type: mysql
+  hostname: 192.168.56.211
+  port: 3306
+  username: root
+  password: 123456
+  tables: app_db.\.*
+  server-id: 5400-5404
+  server-time-zone: UTC
+
+sink:
+  type: doris
+  fenodes: 192.168.56.211:8030
+  username: root
+  password: ""
+  table.create.properties.light_schema_change: true
+  table.create.properties.replication_num: 1
+
+pipeline:
+  name: Sync MySQL Database to Doris
+  parallelism: 2
+EOF
+bash bin/flink-cdc.sh ~/mysql-to-doris.yaml --jar lib/mysql-connector-java-8.0.27.jar
+```
+
+
+
+
 ### flink-cdc version matrix
 
 see <https://nightlies.apache.org/flink/flink-cdc-docs-master/docs/connectors/flink-sources/overview/#supported-flink-versions>
