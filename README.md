@@ -244,7 +244,8 @@ source:
   password: 123456
   tables: app_db.\.*
   server-id: 5400-5404
-  server-time-zone: UTC
+  #server-time-zone: UTC
+  server-time-zone: 'Asia/Shanghai'
 
 sink:
   type: doris
@@ -261,6 +262,15 @@ EOF
 bash bin/flink-cdc.sh ~/mysql-to-doris.yaml --jar lib/mysql-connector-java-8.0.27.jar
 ```
 
+
+```bash
+## simple test cdc
+docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root -P9030 -e "use app_db;select * from orders;"
+docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root --password=123456 -e "use app_db;select * from orders;"
+docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root --password=123456 -e "use app_db; INSERT INTO orders VALUES (3, 66); "
+docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root --password=123456 -e "use app_db; INSERT INTO orders VALUES (4, 88); "
+docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root -P9030 -e "use app_db;select * from orders;"
+```
 
 
 

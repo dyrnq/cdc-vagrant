@@ -33,4 +33,7 @@ services:
       - MYSQL_ROOT_PASSWORD=123456
       - MYSQL_USER=mysqluser
       - MYSQL_PASSWORD=mysqlpw
+      - TZ=Asia/Shanghai
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
 EOF
