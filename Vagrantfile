@@ -108,7 +108,7 @@ SHELL
             machine.vm.provision "shell", inline: <<-SHELL
                 bash /vagrant/scripts/test-flink-cdc.sh
 SHELL
-            
+
         end
     end
 

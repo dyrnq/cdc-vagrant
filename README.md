@@ -160,7 +160,10 @@ mc mb myminio/flink-state
 
 ```bash
 # vm116 vm117 vm118 vm119 vm120 vm121
-bash /vagrant/scripts/install-flink.sh
+su -l root
+
+bash /vagrant/scripts/install-flink.sh --version 1.20.0 --flink-home /opt/flink
+bash /vagrant/scripts/install-flink-cdc.sh --version 3.2.0 --flink-cdc-home /opt/flink-cdc
 # https://blog.csdn.net/hiliang521/article/details/126860098
 
 su -l hduser
@@ -178,61 +181,14 @@ bin/flink run /opt/flink/examples/streaming/WordCount.jar
 
 ### flink cdc
 
-```bash
-bash /vagrant/scripts/install-flink-cdc.sh --version 3.2.0 --flink-cdc-home /opt/flink-cdc
-```
-
-vagrant up vm211
+vagrant ssh vm211
 
 ```bash
-cd /opt/flink-cdc
+cd /opt/test-flink-cdc
 docker compose exec doris-fe mysql -uroot -P9030 -h127.0.0.1 -e "show backends; show frontends;"
-
-docker compose exec doris-fe mysql -uroot -P9030 -h127.0.0.1 -e "CREATE DATABASE app_db;"
-docker compose exec mysql mysql -uroot -p123456
-```
-```sql
--- create database
-CREATE DATABASE app_db;
-
-USE app_db;
-
--- create orders table
-CREATE TABLE `orders` (
-`id` INT NOT NULL,
-`price` DECIMAL(10,2) NOT NULL,
-PRIMARY KEY (`id`)
-);
-
--- insert records
-INSERT INTO `orders` (`id`, `price`) VALUES (1, 4.00);
-INSERT INTO `orders` (`id`, `price`) VALUES (2, 100.00);
-
--- create shipments table
-CREATE TABLE `shipments` (
-`id` INT NOT NULL,
-`city` VARCHAR(255) NOT NULL,
-PRIMARY KEY (`id`)
-);
-
--- insert records
-INSERT INTO `shipments` (`id`, `city`) VALUES (1, 'beijing');
-INSERT INTO `shipments` (`id`, `city`) VALUES (2, 'xian');
-
--- create products table
-CREATE TABLE `products` (
-`id` INT NOT NULL,
-`product` VARCHAR(255) NOT NULL,
-PRIMARY KEY (`id`)
-);
-
--- insert records
-INSERT INTO `products` (`id`, `product`) VALUES (1, 'Beer');
-INSERT INTO `products` (`id`, `product`) VALUES (2, 'Cap');
-INSERT INTO `products` (`id`, `product`) VALUES (3, 'Peanut');
 ```
 
-
+vagrant ssh vm116
 
 ```bash
 cat <<EOF > ~/mysql-to-doris.yaml
@@ -262,18 +218,6 @@ EOF
 bash bin/flink-cdc.sh ~/mysql-to-doris.yaml --jar lib/mysql-connector-java-8.0.27.jar
 ```
 
-
-```bash
-## simple test cdc
-docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root -P9030 -e "use app_db;select * from orders;"
-docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root --password=123456 -e "use app_db;select * from orders;"
-docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root --password=123456 -e "use app_db; INSERT INTO orders VALUES (3, 66); "
-docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root --password=123456 -e "use app_db; INSERT INTO orders VALUES (4, 88); "
-docker run -it --rm --network host mysql:5.7.41 mysql --host 192.168.56.211 --user root -P9030 -e "use app_db;select * from orders;"
-```
-
-
-
 ### flink-cdc version matrix
 
 see <https://nightlies.apache.org/flink/flink-cdc-docs-master/docs/connectors/flink-sources/overview/#supported-flink-versions>
@@ -286,4 +230,4 @@ see <https://nightlies.apache.org/flink/flink-cdc-docs-master/docs/connectors/fl
 - [ResourceManager High Availability](https://hadoop.apache.org/docs/stable/hadoop-yarn/hadoop-yarn-site/ResourceManagerHA.html)
 - [High Performance HTTP Sidecar Load Balancer](https://github.com/minio/sidekick)
 - [https://github.com/apache/doris/tree/master/samples/doris-demo](https://github.com/apache/doris/tree/master/samples/doris-demo)
-- [基于 Flink CDC 构建 MySQL 和 Postgres 的 Streaming ETL](https://nightlies.apache.org/flink/flink-cdc-docs-release-3.2/docs/get-started/quickstart/mysql-to-doris/)
+- [Streaming ELT from MySQL to Doris](https://nightlies.apache.org/flink/flink-cdc-docs-release-3.2/docs/get-started/quickstart/mysql-to-doris/)
