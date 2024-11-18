@@ -215,7 +215,18 @@ pipeline:
   name: Sync MySQL Database to Doris
   parallelism: 2
 EOF
-bash bin/flink-cdc.sh ~/mysql-to-doris.yaml --jar lib/mysql-connector-java-8.0.27.jar
+flink_cdc_home="/opt/flink-cdc"
+pushd $flink_cdc_home || exit 1
+./bin/flink-cdc.sh ~/mysql-to-doris.yaml --jar lib/mysql-connector-java-8.0.27.jar
+popd || exit 1
+```
+
+### fink-sql-client
+
+```bash
+bin/sql-client.sh
+SET execution.checkpointing.interval = 6000;
+
 ```
 
 ### flink-cdc version matrix
