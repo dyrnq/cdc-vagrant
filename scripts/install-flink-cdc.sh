@@ -60,7 +60,7 @@ pushd "${flink_cdc_home}"/lib || exit
 curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/org/apache/flink/flink-cdc-pipeline-connector-doris/${ver}/flink-cdc-pipeline-connector-doris-${ver}.jar
 curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/org/apache/flink/flink-cdc-pipeline-connector-mysql/${ver}/flink-cdc-pipeline-connector-mysql-${ver}.jar
 curl -C- -fSL -# -O https://maven.aliyun.com/repository/public/mysql/mysql-connector-java/8.0.27/mysql-connector-java-8.0.27.jar
-EOF
+
 chown -R hduser:hadoop "${flink_cdc_home}"
 popd || exit
 
