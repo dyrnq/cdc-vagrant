@@ -30,9 +30,9 @@ Streaming ETL (Extract, Transform, Load) is the processing and movement of real-
 
 | vm    | role      | ip             | xxx_home       |
 |-------|-----------|----------------|----------------|
-| vm101 | zookeeper | 192.168.56.101 | /opt/zookeeper |
-| vm102 | zookeeper | 192.168.56.102 | /opt/zookeeper |
-| vm103 | zookeeper | 192.168.56.103 | /opt/zookeeper |
+| vm116 | zookeeper | 192.168.56.116 | /opt/zookeeper |
+| vm117 | zookeeper | 192.168.56.117 | /opt/zookeeper |
+| vm118 | zookeeper | 192.168.56.118 | /opt/zookeeper |
 
 ```bash
 cd /opt/zookeeper
@@ -55,65 +55,7 @@ Mode: follower
 Node count: 5
 ```
 
-### HDFS cluster and YARN cluster
 
-| vm    | role                                 | ip             | xxx_home    |
-|-------|--------------------------------------|----------------|-------------|
-| vm116 | NameNode, zkfc, JournalNode          | 192.168.56.116 | /opt/hadoop |
-| vm117 | NameNode, zkfc, JournalNode          | 192.168.56.117 | /opt/hadoop |
-| vm118 | NameNode, zkfc, JournalNode          | 192.168.56.118 | /opt/hadoop |
-| vm119 | DataNode                             | 192.168.56.119 | /opt/hadoop |
-| vm120 | DataNode                             | 192.168.56.120 | /opt/hadoop |
-| vm121 | DataNode                             | 192.168.56.121 | /opt/hadoop |
-
-| vm    | role     | ip             | xxx_home    |
-|-------|----------|----------------|-------------|
-| vm116 | yarn RM  | 192.168.56.116 | /opt/hadoop |
-| vm117 | yarn RM  | 192.168.56.117 | /opt/hadoop |
-| vm118 | yarn RM  | 192.168.56.118 | /opt/hadoop |
-| vm119 | yarn NM  | 192.168.56.119 | /opt/hadoop |
-| vm120 | yarn NM  | 192.168.56.120 | /opt/hadoop |
-| vm121 | yarn NM  | 192.168.56.121 | /opt/hadoop |
-
-```bash
-###########################################################
-# 以下所有操作都需要在hduser用户下执行
-# su -l hduser
-###########################################################
-# vm116
-# hdfs --daemon start journalnode
-# hdfs namenode -format (执行一次)
-# hdfs zkfc -formatZK (执行一次)
-# hdfs --daemon start namenode && hdfs --daemon start zkfc
-
-
-
-# vm117 vm118
-# hdfs --daemon start journalnode
-# hdfs namenode -bootstrapStandby （执行一次）
-# hdfs --daemon start namenode && hdfs --daemon start zkfc
-
-
-## test hdfs HA
-(
-hdfs haadmin -getServiceState nn1
-hdfs haadmin -getServiceState nn2
-hdfs haadmin -getServiceState nn3
-)
-
-active
-standby
-standby
-
-
-# vm119 vm120 vm121
-# hdfs --daemon start datanode
-```
-
-```bash
-# yarn --daemon start resourcemanager   //vm116 vm117 vm118
-# yarn --daemon start nodemanager       //vm119 vm120 vm121
-```
 
 ### flink cluster
 
@@ -130,42 +72,34 @@ standby
 | vm117 | sidekick, flink(masters+workers) | 192.168.56.117 | /opt/flink |
 | vm118 | sidekick, flink(masters+workers) | 192.168.56.118 | /opt/flink |
 | vm119 | sidekick, flink(workers)         | 192.168.56.119 | /opt/flink |
-| vm120 | sidekick, flink(workers)         | 192.168.56.120 | /opt/flink |
-| vm121 | sidekick, flink(workers)         | 192.168.56.121 | /opt/flink |
 
-> minio client
+> ssh init
 
 ```bash
-curl -o /usr/local/bin/mc -# -fSL https://dl.min.io/client/mc/release/linux-amd64/mc
-chmod +x /usr/local/bin/mc
-mc --help
+vagrant ssh vm116
+## vm116 vm117 vm118 vm119 四台分别执行
+su -l root
+bash /vagrant/scripts/ssh-copy-id.sh --iface enp0s8 --ips "192.168.56.116,192.168.56.117,192.168.56.118,192.168.56.119"
 ```
 
+> minio init
+
 ```bash
+vagrant ssh vm116
+## 只需要在vm116上执行，且执行一次即可
+curl -o /usr/local/bin/mc -# -fSL https://files.m.daocloud.io/dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x /usr/local/bin/mc
+
 mc alias set myminio http://localhost:9000 minioadmin minioadmin
 mc admin user svcacct add --access-key "u5SybesIDVX9b6Pk" --secret-key "lOpH1v7kdM6H8NkPu1H2R6gLc9jcsmWM" myminio minioadmin
 # mc admin user svcacct add --access-key "myuserserviceaccount" --secret-key "myuserserviceaccountpassword" myminio minioadmin
-```
 
-> minio load balancer
-
-```bash
-bash /vagrant/scripts/install-minio-sidekick.sh --port "18000" --sites "http://vm{116...119}:9000"
-```
-
-```bash
 mc mb myminio/flink
 mc mb myminio/flink-state
 ```
 
 ```bash
-# vm116 vm117 vm118 vm119 vm120 vm121
-su -l root
-
-bash /vagrant/scripts/install-flink.sh --version 1.20.0 --flink-home /opt/flink
-bash /vagrant/scripts/install-flink-cdc.sh --version 3.2.0 --flink-cdc-home /opt/flink-cdc
-# https://blog.csdn.net/hiliang521/article/details/126860098
-
+## flink集群启动
 su -l hduser
 cd /opt/flink
 
@@ -173,9 +107,7 @@ cd /opt/flink
 bin/start-cluster.sh
 ## stop-cluster
 bin/stop-cluster.sh
-
-
-
+## 测试一下
 bin/flink run /opt/flink/examples/streaming/WordCount.jar
 ```
 
@@ -184,41 +116,18 @@ bin/flink run /opt/flink/examples/streaming/WordCount.jar
 vagrant ssh vm211
 
 ```bash
-cd /opt/test-flink-cdc
+cd /vagrant/doris
 docker compose exec doris-fe mysql -uroot -P9030 -h127.0.0.1 -e "show backends; show frontends;"
 ```
 
+```bash
 vagrant ssh vm116
 
-```bash
-cat <<EOF > ~/mysql-to-doris.yaml
-source:
-  type: mysql
-  hostname: 192.168.56.211
-  port: 3306
-  username: root
-  password: 123456
-  tables: app_db.\.*
-  server-id: 5400-5404
-  #server-time-zone: UTC
-  server-time-zone: 'Asia/Shanghai'
-
-sink:
-  type: doris
-  fenodes: 192.168.56.211:8030
-  username: root
-  password: ""
-  table.create.properties.light_schema_change: true
-  table.create.properties.replication_num: 1
-
-pipeline:
-  name: Sync MySQL Database to Doris
-  parallelism: 2
-EOF
 flink_cdc_home="/opt/flink-cdc"
 pushd $flink_cdc_home || exit 1
-./bin/flink-cdc.sh ~/mysql-to-doris.yaml --jar lib/mysql-connector-java-8.0.27.jar
+./bin/flink-cdc.sh /vagrant/doris/mysql-to-doris.yaml --jar lib/mysql-connector-java-8.0.27.jar
 popd || exit 1
+
 ```
 
 ### fink-sql-client

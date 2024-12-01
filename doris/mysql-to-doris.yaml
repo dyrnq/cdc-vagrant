@@ -1,0 +1,22 @@
+source:
+  type: mysql
+  hostname: 192.168.56.211
+  port: 3306
+  username: root
+  password: 123456
+  tables: app_db.\.*
+  server-id: 5400-5404
+  #server-time-zone: UTC
+  server-time-zone: 'Asia/Shanghai'
+
+sink:
+  type: doris
+  fenodes: 192.168.56.211:8030
+  username: root
+  password: ""
+  table.create.properties.light_schema_change: true
+  table.create.properties.replication_num: 1
+
+pipeline:
+  name: Sync MySQL Database to Doris
+  parallelism: 2

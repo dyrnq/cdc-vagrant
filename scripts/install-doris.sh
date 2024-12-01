@@ -4,7 +4,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" > /dev/null 2>&1 && pwd -P)
 wait4x_image="${wait4x_image:-atkrad/wait4x:2.12}"
 mysql5_image="${mysql5_image:-mysql:5.7.41}"
 
-pushd "${SCRIPT_DIR}"/../flink-cdc-doris || exit 1
+pushd "${SCRIPT_DIR}"/../doris || exit 1
 
 
 

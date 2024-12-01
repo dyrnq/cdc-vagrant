@@ -37,10 +37,10 @@ is_detached() {
 
 if [ "$remove_flag" = "1" ]; then
     echo "will remove all containers, docker-compose down"
-    docker-compose down
+    docker compose down
 elif [ "$remove_flag" = "2" ]; then
     echo "will remove all containers and data, docker-compose down --volumes"
-    docker-compose down --volumes
+    docker compose down --volumes
 else
 
   if is_detached; then

@@ -46,7 +46,7 @@ docker volume create --name my_volume2 --opt type=none --opt device=/opt/minio/d
 
 # <https://github.com/minio/minio/blob/master/docs/orchestration/docker-compose/docker-compose.yaml>
 cat > /opt/minio/docker-compose.yml <<EOF
-version: '3.7'
+# version: '3.7'
 
 services:
   minio:
