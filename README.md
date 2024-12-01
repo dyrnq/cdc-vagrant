@@ -6,7 +6,6 @@
   - [introduce](#introduce)
   - [architecture](#architecture)
     - [zookeeper cluster](#zookeeper-cluster)
-    - [HDFS cluster and YARN cluster](#hdfs-cluster-and-yarn-cluster)
     - [flink cluster](#flink-cluster)
     - [flink cdc](#flink-cdc)
     - [flink-cdc version matrix](#flink-cdc-version-matrix)
@@ -125,7 +124,7 @@ vagrant ssh vm116
 
 flink_cdc_home="/opt/flink-cdc"
 pushd $flink_cdc_home || exit 1
-./bin/flink-cdc.sh /vagrant/doris/mysql-to-doris.yaml --jar lib/mysql-connector-java-8.0.27.jar
+./bin/flink-cdc.sh /vagrant/doris/mysql-to-doris.yaml --jar lib/mysql-connector-java-8.0.27.jar --flink-home /opt/flink
 popd || exit 1
 
 ```
