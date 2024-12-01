@@ -68,6 +68,11 @@ EOF
         -e "s@_MINIO_VIP_@$ip4@" \
         "${flink_home}"/conf/flink-conf.yaml
     
+    pushd ${flink_home}
+    if [ -f ./bin/migrate-config-file.sh ]; then ./bin/migrate-config-file.sh; fi
+    popd
+    
+
     chown -R hduser:hadoop "${flink_home}"
     # taskmanager.bind-host: localhost    
     # taskmanager.host: localhost
