@@ -35,10 +35,10 @@ timedatectl set-timezone "Asia/Shanghai"
 
 ## 关闭防火墙
 
-systemctl is-active firewalld >/dev/null 2>&1 && systemctl disable --now firewalld
-systemctl is-active dnsmasq >/dev/null 2>&1 && systemctl disable --now dnsmasq
-systemctl is-active apparmor >/dev/null 2>&1 && systemctl disable --now apparmor
-systemctl is-active ufw >/dev/null 2>&1 && systemctl disable --now ufw
+if systemctl is-active firewalld >/dev/null 2>&1; then systemctl disable --now firewalld; fi
+if systemctl is-active dnsmasq >/dev/null 2>&1; then systemctl disable --now dnsmasq; fi
+if systemctl is-active apparmor >/dev/null 2>&1; then systemctl disable --now apparmor; fi
+if systemctl is-active ufw >/dev/null 2>&1; then systemctl disable --now ufw; fi
 
 ## 关闭swap
 
@@ -49,8 +49,9 @@ sed -ri '/^[^#]*swap/s@^@#@' /etc/fstab
 ## 关闭selinux
 
 if [ -f /etc/selinux/config ]; then sed -i.bak 's@enforcing@disabled@' /etc/selinux/config; fi
-command -v setenforce && setenforce 0
-command -v getenforce && getenforce && sestatus
+if command -v setenforce  >/dev/null 2>&1 ; then setenforce 0;  fi
+if command -v getenforce  >/dev/null 2>&1 ; then getenforce;    fi
+if command -v sestatus    >/dev/null 2>&1 ; then sestatus;      fi
 
 ## sysctl设置
 
